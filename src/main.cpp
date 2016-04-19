@@ -1,6 +1,6 @@
 #include <memory>
 
-#include "sdf_scanner.hpp"
+#include "sdf_lexer.hpp"
 
 int main(int argc, char** argv) {
 

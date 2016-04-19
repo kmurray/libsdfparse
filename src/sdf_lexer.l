@@ -1,7 +1,7 @@
 %{
     #include <iostream>
     #include <cassert>
-    #include "sdf_scanner.hpp"
+    #include "sdf_lexer.hpp"
 
     using std::cout;
 
