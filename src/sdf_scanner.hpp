@@ -12,9 +12,15 @@
 /*
  * Flex doesn't support C++ namespaces, so
  * it is faked using the '%option prefix' defined
- * in sdf_scanner.l
+ * in sdf_scanner.l, for some reason Flex also prefixes
+ * the class name with Flex.
+ *
+ * So:
+ * %option prefix=SdfParse_
+ * %option yyclass=Lexer
+ * becomes 'SdfParse_FlexLexer'
  */
-#define yyFlexLexer SdfParse_Lexer
+#define yyFlexLexer SdfParse_FlexLexer
 #include <FlexLexer.h>
 
 #endif
