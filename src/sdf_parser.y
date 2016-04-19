@@ -135,7 +135,7 @@ absolute : LPAR ABSOLUTE iopath_list RPAR { }
          ;
 
 iopath_list : /* empty */ { }
-            | iopath { }
+            | iopath_list iopath { }
             ;
 
 iopath : LPAR IOPATH String String delay_triple delay_triple RPAR { }
