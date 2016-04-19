@@ -92,6 +92,7 @@
 %token IOPATH "IOPATH"
 %token COLON ":"
 %token <int> Integer "integer"
+%token <double> Float "float"
 %token <std::string> String "string"
 %token <std::string> QuotedString "quoted-string"
 %token EOF 0 "end-of-file"
@@ -99,7 +100,51 @@
 %start sdf_file
 
 %%
-sdf_file : { }
+sdf_file : LPAR DELAYFILE { }
+         | sdf_file sdf_version { }
+         | sdf_file divider { }
+         | sdf_file timescale { }
+         | sdf_file cell { }
+         | sdf_file RPAR { }
+         ;
+
+sdf_version : LPAR SDFVERSION QuotedString RPAR { }
+            ;
+
+divider : LPAR DIVIDER String RPAR { }
+        ;
+
+timescale : LPAR TIMESCALE Integer String RPAR { }
+          ;
+
+cell : LPAR CELL cell_type instance delay RPAR { }
+     ;
+
+cell_type : LPAR CELLTYPE QuotedString RPAR { }
+          ;
+
+instance : LPAR INSTANCE String RPAR { }
+         ;
+
+delay : LPAR DELAY absolute RPAR { }
+      ;
+
+absolute : LPAR ABSOLUTE iopath_list RPAR { }
+         ;
+
+iopath_list : /* empty */ { }
+            | iopath { }
+            ;
+
+iopath : LPAR IOPATH String String delay_triple delay_triple RPAR { }
+       ;
+
+delay_triple : LPAR delay_value COLON delay_value COLON delay_value RPAR { }
+             ;
+
+delay_value : Integer { }
+            | Float { }
+            ;
 
 %%
 

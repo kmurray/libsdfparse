@@ -1,6 +1,6 @@
 all:
 	flex -o sdf_lexer.gen.cpp src/sdf_lexer.l
-	bison -o sdf_parser.gen.cpp src/sdf_parser.y
+	bison -r all -o sdf_parser.gen.cpp src/sdf_parser.y
 	g++ -g -std=c++11 -I. -Isrc -c sdf_lexer.gen.cpp
 	g++ -g -std=c++11 -I. -Isrc -c sdf_parser.gen.cpp
 	g++ -g -std=c++11 -I. -Isrc -c src/main.cpp
