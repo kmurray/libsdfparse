@@ -70,7 +70,7 @@ DELAY                                           { cout << "DELAY\n"; return sdfp
 ABSOLUTE                                        { cout << "ABSOLUTE\n"; return sdfparse::Parser::make_ABSOLUTE(); }
 IOPATH                                          { cout << "IOPATH\n"; return sdfparse::Parser::make_IOPATH(); }
 {COLON}                                         { cout << "COLON\n"; return sdfparse::Parser::make_COLON(); }
-{DIGIT}+                                        {   
+[-+]?{DIGIT}+                                   {   
                                                     cout << "Integer: " << YYText() << "\n"; 
                                                     stringstream ss;
                                                     ss << YYText();
@@ -78,6 +78,15 @@ IOPATH                                          { cout << "IOPATH\n"; return sdf
                                                     ss >> val;
                                                     assert(!ss.fail() && ss.eof());
                                                     return sdfparse::Parser::make_Integer(val); 
+                                                }
+[-+]?({DIGIT}*\.?{DIGIT}+|{DIGIT}+\.)           { 
+                                                    cout << "Float: " << YYText() << "\n";
+                                                    stringstream ss;
+                                                    ss << YYText();
+                                                    double val;
+                                                    ss >> val;
+                                                    assert(!ss.fail() && ss.eof());
+                                                    return sdfparse::Parser::make_Float(val); 
                                                 }
 \"({ALPHA}|{DIGIT}|{SYMBOL})+\"                 {   
                                                     cout << "Qstring: " << YYText() << "\n"; 
