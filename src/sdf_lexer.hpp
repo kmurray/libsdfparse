@@ -44,6 +44,8 @@ class Lexer : private yyFlexLexer {
     //implementation details from anyone using Lexer
     public:
         sdfparse::Parser::symbol_type next_token();
+
+        using yyFlexLexer::switch_streams;
 };
 
 } //sdfparse
