@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sdf_parser.gen.hpp"
+
 /*
  * Flex requires that yyFlexLexer is equivalent to
  * the lexer class we are using, before we include
@@ -32,8 +34,7 @@
  * We re-define it to something reasonable
  */
 #undef YY_DECL
-#define YY_DECL int sdfparse::Lexer::next_token()
-
+#define YY_DECL sdfparse::Parser::symbol_type sdfparse::Lexer::next_token()
 
 
 namespace sdfparse {
@@ -42,7 +43,7 @@ class Lexer : private yyFlexLexer {
     //We use private inheritance to hide the flex
     //implementation details from anyone using Lexer
     public:
-        int next_token();
+        sdfparse::Parser::symbol_type next_token();
 };
 
 } //sdfparse

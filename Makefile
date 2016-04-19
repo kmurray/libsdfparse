@@ -1,8 +1,10 @@
 all:
 	flex -o sdf_lexer.gen.cpp src/sdf_lexer.l
-	g++ -std=c++11 -Isrc -c sdf_lexer.gen.cpp
-	g++ -std=c++11 -Isrc -c src/main.cpp
-	g++ -std=c++11 sdf_lexer.gen.o main.o -o sdf_parse
+	bison -o sdf_parser.gen.cpp src/sdf_parser.y
+	g++ -std=c++11 -I. -Isrc -c sdf_lexer.gen.cpp
+	g++ -std=c++11 -I. -Isrc -c sdf_parser.gen.cpp
+	g++ -std=c++11 -I. -Isrc -c src/main.cpp
+	g++ -std=c++11 sdf_parser.gen.o sdf_lexer.gen.o main.o -o sdf_parse
 
 clean:
-	rm -f sdf_lexer.gen.cpp *.o sdf_parse
+	rm -f *.gen.hpp *.gen.cpp stack.hh *.o sdf_parse
