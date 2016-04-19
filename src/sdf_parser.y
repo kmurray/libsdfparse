@@ -100,12 +100,14 @@
 %start sdf_file
 
 %%
-sdf_file : LPAR DELAYFILE { }
-         | sdf_file sdf_version { }
-         | sdf_file divider { }
-         | sdf_file timescale { }
-         | sdf_file cell { }
-         | sdf_file RPAR { }
+sdf_file : LPAR DELAYFILE sdf_data RPAR { }
+         ;
+
+sdf_data : /* Empty */ { }
+         | sdf_data sdf_version { }
+         | sdf_data divider { }
+         | sdf_data timescale { }
+         | sdf_data cell { }
          ;
 
 sdf_version : LPAR SDFVERSION QuotedString RPAR { }
