@@ -3,11 +3,17 @@
 
 #include <string>
 #include <vector>
+#include <limits>
 
 namespace sdfparse {
 
     class RealTriple {
         public:
+            RealTriple()
+                : min_(std::numeric_limits<double>::quiet_NaN())
+                , typ_(std::numeric_limits<double>::quiet_NaN())
+                , max_(std::numeric_limits<double>::quiet_NaN())
+                {}
             RealTriple(double min, double typ, double max)
                 : min_(min)
                 , typ_(typ)
@@ -26,6 +32,7 @@ namespace sdfparse {
 
     class Iopath {
         public:
+            Iopath() = default;
             Iopath(const std::string& input, const std::string& output, RealTriple rise, RealTriple fall)
                 : input_(input)
                 , output_(output)
@@ -52,6 +59,7 @@ namespace sdfparse {
                 ABSOLUTE
             };
 
+            Delay() = default;
             Delay(Delay::Type type, std::vector<Iopath> iopaths)
                 : type_(type)
                 , iopaths_(iopaths)
@@ -66,15 +74,17 @@ namespace sdfparse {
     };
 
     class Cell {
-        Cell(const std::string& celltype, const std::string& instance, Delay delay)
-            : celltype_(celltype)
-            , instance_(instance)
-            , delay_(delay)
-            {}
+        public:
+            Cell() = default;
+            Cell(const std::string& celltype, const std::string& instance, Delay delay)
+                : celltype_(celltype)
+                , instance_(instance)
+                , delay_(delay)
+                {}
 
-            const std::string& celltype() const { return celltype_; }
-            const std::string& instance() const { return instance_; }
-            const Delay& delay() const { return delay_; }
+                const std::string& celltype() const { return celltype_; }
+                const std::string& instance() const { return instance_; }
+                const Delay& delay() const { return delay_; }
         private:
             std::string celltype_;
             std::string instance_;
@@ -83,7 +93,7 @@ namespace sdfparse {
 
     class Timescale {
         public:
-            Timescale(double scale, const std::string& unit)
+            Timescale(double scale=1., const std::string& unit="ns")
                 : scale_(scale)
                 , unit_(unit)
                 {}
@@ -95,7 +105,6 @@ namespace sdfparse {
             std::string unit_;
     };
 
-
     class Header {
         public:
             Header(const std::string& version="", const std::string& hierarchy_divider=".", const Timescale& timescale=Timescale(1., "ns"))
@@ -104,9 +113,13 @@ namespace sdfparse {
                 , timescale_(timescale)
                 {}
 
-            const std::string& version() { return version_; }
-            const std::string& hierarchy_divider() { return hierarchy_divider_; }
-            const Timescale& timescale() { return timescale_; }
+            const std::string& version() const { return version_; }
+            const std::string& hierarchy_divider() const { return hierarchy_divider_; }
+            const Timescale& timescale() const { return timescale_; }
+
+            void set_version(const std::string& version) { version_ = version; }
+            void set_hierarchy_divider(const std::string& hierarchy_divider) { hierarchy_divider_ = hierarchy_divider; }
+            void set_timescale(const Timescale& timescale) { timescale_ = timescale; }
         private:
             std::string version_;
             std::string hierarchy_divider_;

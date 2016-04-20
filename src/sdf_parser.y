@@ -65,6 +65,7 @@
     }
 
     #include "sdf_error.hpp"
+    #include "sdf_data.hpp"
 
     //This is not defined by default for some reason...
     #define YY_NULLPTR nullptr
@@ -103,54 +104,69 @@
 %token <std::string> Qstring "quoted-string"
 %token EOF 0 "end-of-file"
 
+%type <RealTriple> real_triple
+%type <Iopath> iopath
+%type <std::vector<Iopath>> iopath_list
+%type <std::vector<Iopath>> absolute
+%type <Delay> delay
+%type <std::string> instance
+%type <std::string> celltype
+%type <Cell> cell
+%type <Timescale> timescale
+%type <std::string> hierarchy_divider
+%type <std::string> sdf_version
+%type <Header> sdf_header
+%type <std::vector<Cell>> cell_list
+%type <DelayFile> sdf_file
+
 %start sdf_file
 
 %%
-sdf_file : LPAR DELAYFILE sdf_data RPAR { }
+sdf_file : LPAR DELAYFILE sdf_header cell_list RPAR { $$ = DelayFile($3, $4); }
          ;
 
-sdf_data : sdf_version { }
-         | sdf_data hierarchy_divider { }
-         | sdf_data timescale { }
-         | sdf_data cell { }
-         ;
+sdf_header : sdf_version                    { $$ = Header($1); }
+           | sdf_header hierarchy_divider   { $1.set_hierarchy_divider($2); }
+           | sdf_header timescale           { $1.set_timescale($2); }
+           ;
 
-sdf_version : LPAR SDFVERSION Qstring RPAR { }
+cell_list : cell { $$ = std::vector<Cell>(); $$.push_back($1); }
+          | cell_list cell { $1.push_back($2); }
+          ;
+
+sdf_version : LPAR SDFVERSION Qstring RPAR { $$ = $3; }
             ;
 
-hierarchy_divider : LPAR DIVIDER String RPAR { }
+hierarchy_divider : LPAR DIVIDER String RPAR { $$ = $3; }
                   ;
 
-timescale : LPAR TIMESCALE Float String RPAR { }
+timescale : LPAR TIMESCALE Float String RPAR { $$ = Timescale($3, $4); }
           ;
 
-cell : LPAR CELL cell_type instance delay RPAR { }
+cell : LPAR CELL celltype instance delay RPAR { $$ = Cell($3, $4, $5); }
      ;
 
-cell_type : LPAR CELLTYPE Qstring RPAR { }
-          ;
-
-instance : LPAR INSTANCE String RPAR { }
+celltype : LPAR CELLTYPE Qstring RPAR { $$ = $3; }
          ;
 
-delay : LPAR DELAY absolute RPAR { }
+instance : LPAR INSTANCE String RPAR { $$ = $3; }
+         ;
+
+delay : LPAR DELAY absolute RPAR { $$ = Delay(Delay::Type::ABSOLUTE, $3); }
       ;
 
-absolute : LPAR ABSOLUTE iopath_list RPAR { }
+absolute : LPAR ABSOLUTE iopath_list RPAR { $$ = $3; }
          ;
 
-iopath_list : /* empty */ { }
-            | iopath_list iopath { }
+iopath_list : /* empty */        { $$ = std::vector<Iopath>(); }
+            | iopath_list iopath { $1.push_back($2); }
             ;
 
-iopath : LPAR IOPATH String String delay_triple delay_triple RPAR { }
+iopath : LPAR IOPATH String String real_triple real_triple RPAR { $$ = Iopath($3, $4, $5, $6); }
        ;
 
-delay_triple : LPAR delay_value COLON delay_value COLON delay_value RPAR { }
+real_triple : LPAR Float COLON Float COLON Float RPAR { $$ = RealTriple($2, $4, $6); }
              ;
-
-delay_value : Float { }
-            ;
 
 %%
 
