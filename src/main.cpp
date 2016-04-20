@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 
 #include "sdf_loader.hpp"
 
@@ -10,10 +9,8 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    std::ifstream is(argv[1]);
-
     sdfparse::Loader sdf_loader;
-    sdf_loader.load(is);
+    sdf_loader.load(argv[1]);
 
     return 0;
 }

@@ -1,4 +1,4 @@
-#include <iostream>
+#include <fstream>
 #include "sdf_loader.hpp"
 
 #include "sdf_lexer.hpp"
@@ -7,8 +7,9 @@
 namespace sdfparse {
 
 Loader::Loader()
-    : lexer_(new Lexer)
-    , parser_(new Parser(*lexer_))
+    : filename_("<inputstream>") //Initialize the filename
+    , lexer_(new Lexer())
+    , parser_(new Parser(*lexer_, *this))
     {}
 
 
@@ -17,6 +18,13 @@ Loader::Loader()
 //full definitions of Lexer and Parser
 Loader::~Loader()
     {}
+
+void Loader::load(std::string filename) {
+    std::ifstream is(filename);
+    filename_ = filename;
+
+    load(is);
+}
 
 void Loader::load(std::istream& is) {
     assert(is.good());

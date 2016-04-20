@@ -53,6 +53,7 @@
 
 /* The parser expects the lexer to be provided as a constructor argument */
 %parse-param {sdfparse::Lexer& lexer}
+%parse-param {sdfparse::Loader& driver}
 
 /* Our yylex implementation expects the lexer to be passed as an argument */
 %lex-param {sdfparse::Lexer& lexer}
@@ -60,6 +61,7 @@
 %code requires {
     namespace sdfparse {
         class Lexer;
+        class Loader;
     }
 
 
@@ -70,11 +72,12 @@
 %code top {
 
     #include "sdf_lexer.hpp"
+    #include "sdf_loader.hpp"
 
     //Bison calls yylex() to get the next token.
     //Since we have re-defined the equivalent function in the lexer
     //we need to tell Bison how to get the next token.
-    static sdfparse::Parser::symbol_type yylex(sdfparse::Lexer &lexer) {
+    static sdfparse::Parser::symbol_type yylex(sdfparse::Lexer& lexer) {
         return lexer.next_token();
     }
 
@@ -100,6 +103,10 @@
 %token EOF 0 "end-of-file"
 
 %start sdf_file
+
+%initial-action {
+    @$.begin.filename = @$.end.filename = &driver.filename_;
+};
 
 %%
 sdf_file : LPAR DELAYFILE sdf_data RPAR { }

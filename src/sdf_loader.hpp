@@ -17,9 +17,12 @@ class Loader {
     public:
         Loader();
         ~Loader();
+        void load(std::string filename);
         void load(std::istream& is);
 
     private:
+        friend Parser;
+        std::string filename_;
         std::unique_ptr<Lexer> lexer_;
         std::unique_ptr<Parser> parser_;
 };
