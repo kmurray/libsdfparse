@@ -122,16 +122,16 @@
 %start sdf_file
 
 %%
-sdf_file : LPAR DELAYFILE sdf_header cell_list RPAR { $$ = DelayFile($3, $4); }
+sdf_file : LPAR DELAYFILE sdf_header cell_list RPAR { driver.delayfile_ = DelayFile($3, $4); }
          ;
 
 sdf_header : sdf_version                    { $$ = Header($1); }
-           | sdf_header hierarchy_divider   { $1.set_hierarchy_divider($2); }
-           | sdf_header timescale           { $1.set_timescale($2); }
+           | sdf_header hierarchy_divider   { $1.set_divider($2); $$ = $1; }
+           | sdf_header timescale           { $1.set_timescale($2); $$ = $1; }
            ;
 
 cell_list : cell { $$ = std::vector<Cell>(); $$.push_back($1); }
-          | cell_list cell { $1.push_back($2); }
+          | cell_list cell { $1.push_back($2); $$ = $1; }
           ;
 
 sdf_version : LPAR SDFVERSION Qstring RPAR { $$ = $3; }
@@ -159,7 +159,7 @@ absolute : LPAR ABSOLUTE iopath_list RPAR { $$ = $3; }
          ;
 
 iopath_list : /* empty */        { $$ = std::vector<Iopath>(); }
-            | iopath_list iopath { $1.push_back($2); }
+            | iopath_list iopath { $1.push_back($2); $$ = $1; }
             ;
 
 iopath : LPAR IOPATH String String real_triple real_triple RPAR { $$ = Iopath($3, $4, $5, $6); }

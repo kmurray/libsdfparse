@@ -26,6 +26,7 @@ class Loader {
         virtual void on_error(ParseError& error);
 
     private:
+        friend Parser;
         std::string filename_;
         std::unique_ptr<Lexer> lexer_;
         std::unique_ptr<Parser> parser_;

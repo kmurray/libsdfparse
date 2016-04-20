@@ -1,9 +1,12 @@
 #pragma once
-#include <sdf_data_fwd.hpp>
 
 #include <string>
 #include <vector>
 #include <limits>
+#include <iosfwd>
+#include <cassert>
+
+#include "sdf_data_fwd.hpp"
 
 namespace sdfparse {
 
@@ -24,11 +27,14 @@ namespace sdfparse {
             double max() const { return max_; }
             double typ() const { return typ_; }
 
+            void print(std::ostream& os, int depth=0) const;
+
         private:
             double min_;
             double typ_;
             double max_;
     };
+    std::ostream& operator<<(std::ostream& os, const RealTriple& val);
 
     class Iopath {
         public:
@@ -45,6 +51,7 @@ namespace sdfparse {
             const RealTriple& rise() const { return rise_; }
             const RealTriple& fall() const { return fall_; }
 
+            void print(std::ostream& os, int depth=0) const;
         private:
             std::string input_;
             std::string output_;
@@ -68,10 +75,12 @@ namespace sdfparse {
             Delay::Type type() const { return type_; }
             const std::vector<Iopath>& iopaths() const { return iopaths_; }
 
+            void print(std::ostream& os, int depth=0) const;
         private:
             Delay::Type type_;
             std::vector<Iopath> iopaths_;
     };
+    std::ostream& operator<<(std::ostream& os, const Delay::Type& type);
 
     class Cell {
         public:
@@ -85,6 +94,8 @@ namespace sdfparse {
                 const std::string& celltype() const { return celltype_; }
                 const std::string& instance() const { return instance_; }
                 const Delay& delay() const { return delay_; }
+
+                void print(std::ostream& os, int depth=0) const;
         private:
             std::string celltype_;
             std::string instance_;
@@ -93,36 +104,39 @@ namespace sdfparse {
 
     class Timescale {
         public:
-            Timescale(double scale=1., const std::string& unit="ns")
-                : scale_(scale)
+            Timescale(double value=1., const std::string& unit="ns")
+                : value_(value)
                 , unit_(unit)
                 {}
 
-            double scale() { return scale_; }
-            const std::string& unit() { return unit_; }
+            double value() const { return value_; }
+            const std::string& unit() const { return unit_; }
+
+            void print(std::ostream& os, int depth=0) const;
         private:
-            double scale_;
+            double value_;
             std::string unit_;
     };
 
     class Header {
         public:
-            Header(const std::string& version="", const std::string& hierarchy_divider=".", const Timescale& timescale=Timescale(1., "ns"))
-                : version_(version)
-                , hierarchy_divider_(hierarchy_divider)
+            Header(const std::string& sdfversion="", const std::string& divider=".", const Timescale& timescale=Timescale(1., "ns"))
+                : sdfversion_(sdfversion)
+                , divider_(divider)
                 , timescale_(timescale)
                 {}
 
-            const std::string& version() const { return version_; }
-            const std::string& hierarchy_divider() const { return hierarchy_divider_; }
+            const std::string& sdfversion() const { return sdfversion_; }
+            const std::string& divider() const { return divider_; }
             const Timescale& timescale() const { return timescale_; }
 
-            void set_version(const std::string& version) { version_ = version; }
-            void set_hierarchy_divider(const std::string& hierarchy_divider) { hierarchy_divider_ = hierarchy_divider; }
+            void set_divider(const std::string& divider) { divider_ = divider; }
             void set_timescale(const Timescale& timescale) { timescale_ = timescale; }
+
+            void print(std::ostream& os, int depth=0) const;
         private:
-            std::string version_;
-            std::string hierarchy_divider_;
+            std::string sdfversion_;
+            std::string divider_;
             Timescale timescale_;
     };
 
@@ -133,8 +147,10 @@ namespace sdfparse {
                 , cells_(cells)
                 {}
 
-            const Header& header() { return header_; }
-            const std::vector<Cell>& cells() { return cells_; }
+            const Header& header() const { return header_; }
+            const std::vector<Cell>& cells() const { return cells_; }
+
+            void print(std::ostream& os, int depth=0) const;
         private:
             Header header_;
             std::vector<Cell> cells_;
