@@ -94,10 +94,9 @@
 %token ABSOLUTE "ABSOLUTE"
 %token IOPATH "IOPATH"
 %token COLON ":"
-%token <int> Integer "integer"
 %token <double> Float "float"
 %token <std::string> String "string"
-%token <std::string> QuotedString "quoted-string"
+%token <std::string> Qstring "quoted-string"
 %token EOF 0 "end-of-file"
 
 %start sdf_file
@@ -106,26 +105,25 @@
 sdf_file : LPAR DELAYFILE sdf_data RPAR { }
          ;
 
-sdf_data : /* Empty */ { }
-         | sdf_data sdf_version { }
-         | sdf_data divider { }
+sdf_data : sdf_version { }
+         | sdf_data hierarchy_divider { }
          | sdf_data timescale { }
          | sdf_data cell { }
          ;
 
-sdf_version : LPAR SDFVERSION QuotedString RPAR { }
+sdf_version : LPAR SDFVERSION Qstring RPAR { }
             ;
 
-divider : LPAR DIVIDER String RPAR { }
-        ;
+hierarchy_divider : LPAR DIVIDER String RPAR { }
+                  ;
 
-timescale : LPAR TIMESCALE Integer String RPAR { }
+timescale : LPAR TIMESCALE Float String RPAR { }
           ;
 
 cell : LPAR CELL cell_type instance delay RPAR { }
      ;
 
-cell_type : LPAR CELLTYPE QuotedString RPAR { }
+cell_type : LPAR CELLTYPE Qstring RPAR { }
           ;
 
 instance : LPAR INSTANCE String RPAR { }
@@ -147,8 +145,7 @@ iopath : LPAR IOPATH String String delay_triple delay_triple RPAR { }
 delay_triple : LPAR delay_value COLON delay_value COLON delay_value RPAR { }
              ;
 
-delay_value : Integer { }
-            | Float { }
+delay_value : Float { }
             ;
 
 %%

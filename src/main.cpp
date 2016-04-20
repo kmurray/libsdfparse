@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 
-//#include "sdf_lexer.hpp"
-//#include "sdf_parser.gen.hpp"
 #include "sdf_loader.hpp"
 
 int main(int argc, char** argv) {

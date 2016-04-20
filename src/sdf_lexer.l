@@ -71,15 +71,6 @@ DELAY                                           { cout << "DELAY\n"; return sdfp
 ABSOLUTE                                        { cout << "ABSOLUTE\n"; return sdfparse::Parser::make_ABSOLUTE(sdfparse::location()); }
 IOPATH                                          { cout << "IOPATH\n"; return sdfparse::Parser::make_IOPATH(sdfparse::location()); }
 {COLON}                                         { cout << "COLON\n"; return sdfparse::Parser::make_COLON(sdfparse::location()); }
-[-+]?{DIGIT}+                                   {   
-                                                    cout << "Integer: " << YYText() << "\n"; 
-                                                    stringstream ss;
-                                                    ss << YYText();
-                                                    int val;
-                                                    ss >> val;
-                                                    assert(!ss.fail() && ss.eof());
-                                                    return sdfparse::Parser::make_Integer(val, sdfparse::location()); 
-                                                }
 [-+]?({DIGIT}*\.?{DIGIT}+|{DIGIT}+\.)           { 
                                                     cout << "Float: " << YYText() << "\n";
                                                     stringstream ss;
@@ -91,7 +82,7 @@ IOPATH                                          { cout << "IOPATH\n"; return sdf
                                                 }
 \"({ALPHA}|{DIGIT}|{SYMBOL})+\"                 {   
                                                     cout << "Qstring: " << YYText() << "\n"; 
-                                                    return sdfparse::Parser::make_QuotedString(YYText(), sdfparse::location()); 
+                                                    return sdfparse::Parser::make_Qstring(YYText(), sdfparse::location()); 
                                                 }
 ({ALPHA}|{SYMBOL})({ALPHA}|{DIGIT}|{SYMBOL})*   { 
                                                     cout << "String: " << YYText() << "\n"; 
