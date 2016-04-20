@@ -93,8 +93,12 @@ IOPATH                                          { /* cout << "IOPATH\n"; */ retu
                                                     return sdfparse::Parser::make_Float(val, loc_); 
                                                 }
 \"({ALPHA}|{DIGIT}|{SYMBOL})+\"                 {   
-                                                    /*cout << "Qstring: " << YYText() << "\n"; */
-                                                    return sdfparse::Parser::make_Qstring(YYText(), loc_); 
+                                                    //Trim off the beginning and ending quotes
+                                                    const char* begin = YYText() + 1;
+                                                    const char* end = begin + YYLeng() - 2;
+                                                    std::string str(begin, end);
+                                                    /*cout << "Qstring: " << str << "\n"; */
+                                                    return sdfparse::Parser::make_Qstring(str, loc_); 
                                                 }
 ({ALPHA}|{SYMBOL})({ALPHA}|{DIGIT}|{SYMBOL})*   { 
                                                     /*cout << "String: " << YYText() << "\n"; */
