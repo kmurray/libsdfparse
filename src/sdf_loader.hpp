@@ -3,8 +3,7 @@
 #include <iosfwd>
 #include <memory>
 
-//#include "sdf_lexer.hpp"
-//#include "sdf_parser.gen.hpp"
+#include "sdf_data.hpp"
 
 namespace sdfparse {
 
@@ -22,7 +21,7 @@ class Loader {
         bool load(std::string filename);
         bool load(std::istream& is, std::string filename="<inputstream>");
 
-        //SdfData get_sdf_data();
+        const DelayFile& get_delayfile() { return delayfile_; };
 
         virtual void on_error(ParseError& error);
 
@@ -30,6 +29,8 @@ class Loader {
         std::string filename_;
         std::unique_ptr<Lexer> lexer_;
         std::unique_ptr<Parser> parser_;
+
+        DelayFile delayfile_;
 };
 
 } //sdfparse
