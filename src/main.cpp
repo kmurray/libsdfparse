@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "sdf_loader.hpp"
+#include "sdfparse.hpp"
 
 int main(int argc, char** argv) {
 
@@ -18,5 +18,4 @@ int main(int argc, char** argv) {
         std::cout << "Failed to load SDF\n";
         return 1;
     }
-
 }

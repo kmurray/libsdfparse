@@ -22,6 +22,8 @@ class Loader {
         bool load(std::string filename);
         bool load(std::istream& is, std::string filename="<inputstream>");
 
+        //SdfData get_sdf_data();
+
         virtual void on_error(ParseError& error);
 
     private:
