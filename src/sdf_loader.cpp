@@ -7,7 +7,7 @@
 namespace sdfparse {
 
 Loader::Loader()
-    : filename_("<inputstream>") //Initialize the filename
+    : filename_("") //Initialize the filename
     , lexer_(new Lexer())
     , parser_(new Parser(*lexer_, *this))
     {}
@@ -21,16 +21,19 @@ Loader::~Loader()
 
 void Loader::load(std::string filename) {
     std::ifstream is(filename);
-    filename_ = filename;
-
-    load(is);
+    load(is, filename);
 }
 
-void Loader::load(std::istream& is) {
+void Loader::load(std::istream& is, std::string filename) {
     assert(is.good());
 
+    //Update the filename for location references
+    filename_ = filename;
+
+    //Point the lexer at the new input
     lexer_->switch_streams(&is);
 
+    //Do the parsing
     auto result = parser_->parse();
     assert(result == 0);
 }

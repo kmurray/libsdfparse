@@ -18,7 +18,7 @@ class Loader {
         Loader();
         ~Loader();
         void load(std::string filename);
-        void load(std::istream& is);
+        void load(std::istream& is, std::string filename="<inputstream>");
 
     private:
         friend Parser;
