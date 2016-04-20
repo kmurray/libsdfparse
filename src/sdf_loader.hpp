@@ -11,17 +11,20 @@ namespace sdfparse {
 //Forward delcarations
 class Lexer;
 class Parser;
+class ParseError;
 
 class Loader {
 
     public:
         Loader();
         ~Loader();
-        void load(std::string filename);
-        void load(std::istream& is, std::string filename="<inputstream>");
+
+        bool load(std::string filename);
+        bool load(std::istream& is, std::string filename="<inputstream>");
+
+        virtual void on_error(ParseError& error);
 
     private:
-        friend Parser;
         std::string filename_;
         std::unique_ptr<Lexer> lexer_;
         std::unique_ptr<Parser> parser_;

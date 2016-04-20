@@ -14,6 +14,8 @@
     //of the token.
     #define YY_USER_ACTION loc_.columns(YYLeng());
 
+    #define yyterminate() sdfparse::Parser::make_EOF(loc_)
+
 %}
 
 /* Generate a C++ lexer */
@@ -101,11 +103,10 @@ IOPATH                                          { cout << "IOPATH\n"; return sdf
 
 .                                               { 
                                                     stringstream ss;
-                                                    ss << "SDF Error " << loc_ << ": Unexpected character '" << YYText() << "'";
-                                                    auto str = ss.str();
-                                                    LexerError(str.c_str());
+                                                    ss << "Unexpected character '" << YYText() << "'";
+                                                    throw sdfparse::ParseError(ss.str(), loc_);
                                                 }
 
-<<EOF>>                                         { cout << "EOF\n"; return sdfparse::Parser::make_EOF(loc_); }
+<<EOF>>                                         { cout << "EOF\n"; return yyterminate(); }
 
 %%

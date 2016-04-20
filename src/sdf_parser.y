@@ -64,6 +64,7 @@
         class Loader;
     }
 
+    #include "sdf_error.hpp"
 
     //This is not defined by default for some reason...
     #define YY_NULLPTR nullptr
@@ -155,5 +156,5 @@ delay_value : Float { }
 
 //We need to provide an implementation for parser error handling
 void sdfparse::Parser::error(const sdfparse::location& loc, const std::string& msg) {
-    std::cout << "SDF Error " << loc << ": " << msg << "\n";
+    throw sdfparse::ParseError(msg, loc);
 }

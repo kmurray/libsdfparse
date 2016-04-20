@@ -10,7 +10,13 @@ int main(int argc, char** argv) {
     }
 
     sdfparse::Loader sdf_loader;
-    sdf_loader.load(argv[1]);
+    bool loaded = sdf_loader.load(argv[1]);
+    if(loaded) {
+        std::cout << "Successfully loaded SDF\n";
+        return 0;
+    } else {
+        std::cout << "Failed to load SDF\n";
+        return 1;
+    }
 
-    return 0;
 }

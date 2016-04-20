@@ -20,12 +20,12 @@ Loader::Loader()
 Loader::~Loader()
     {}
 
-void Loader::load(std::string filename) {
+bool Loader::load(std::string filename) {
     std::ifstream is(filename);
-    load(is, filename);
+    return load(is, filename);
 }
 
-void Loader::load(std::istream& is, std::string filename) {
+bool Loader::load(std::istream& is, std::string filename) {
     assert(is.good());
 
     //Update the filename for location references
@@ -39,9 +39,25 @@ void Loader::load(std::istream& is, std::string filename) {
     auto loc = location(pos, pos);
     lexer_->set_loc(loc);
 
-    //Do the parsing
-    auto result = parser_->parse();
-    assert(result == 0);
+    int retval;
+    try {
+        //Do the parsing
+        retval = parser_->parse();
+
+    } catch (ParseError& error) {
+        //Users can re-define on_error if they want
+        //to do something else (like re-throw)
+        on_error(error);
+        return false;
+    }
+
+    //Bision returns 0 if successful
+    return (retval == 0);
+}
+
+void Loader::on_error(ParseError& error) {
+    //Default implementation, just print out the error
+    std::cout << "SDF Error " << error.loc() << ": " << error.what() << "\n";
 }
 
 } //sdfparse
