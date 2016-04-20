@@ -3,14 +3,15 @@
 
 #include "sdf_lexer.hpp"
 #include "sdf_parser.gen.hpp"
+#include "location.hh"
 
 namespace sdfparse {
 
 Loader::Loader()
     : filename_("") //Initialize the filename
     , lexer_(new Lexer())
-    , parser_(new Parser(*lexer_, *this))
-    {}
+    , parser_(new Parser(*lexer_, *this)) {
+}
 
 
 //We need to declare the destructor in the .cpp file,
@@ -32,6 +33,11 @@ void Loader::load(std::istream& is, std::string filename) {
 
     //Point the lexer at the new input
     lexer_->switch_streams(&is);
+
+    //Initialize locations with filename
+    auto pos = position(&filename_);
+    auto loc = location(pos, pos);
+    lexer_->set_loc(loc);
 
     //Do the parsing
     auto result = parser_->parse();

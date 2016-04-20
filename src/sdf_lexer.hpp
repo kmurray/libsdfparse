@@ -36,6 +36,10 @@
 #undef YY_DECL
 #define YY_DECL sdfparse::Parser::symbol_type sdfparse::Lexer::next_token()
 
+/*
+ * Bison generated location tracking
+ */
+#include "location.hh"
 
 namespace sdfparse {
 
@@ -46,6 +50,11 @@ class Lexer : private yyFlexLexer {
         sdfparse::Parser::symbol_type next_token();
 
         using yyFlexLexer::switch_streams;
+
+        location get_loc() { return loc_; }
+        void set_loc(location& loc) { loc_ = loc; }
+    private:
+        location loc_; 
 };
 
 } //sdfparse

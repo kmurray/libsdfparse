@@ -9,6 +9,11 @@
     using std::cout;
     using std::stringstream;
 
+    //Called everytime a token matches
+    //This advances the end of the location to the end
+    //of the token.
+    #define YY_USER_ACTION loc_.columns(YYLeng());
+
 %}
 
 /* Generate a C++ lexer */
@@ -54,23 +59,28 @@ ENDL (\n|\n\r)
 
 %%
 
-{WS}                                            { /* skip white space */ }
-{ENDL}                                          { /* skip end-of-line */ }
+%{
+    //Run everytime yylex is called
+    loc_.step(); //Move begining of location to end
+%}
 
-\(                                              { cout << "LPAR\n"; return sdfparse::Parser::make_LPAR(sdfparse::location()); }
-\)                                              { cout << "RPAR\n"; return sdfparse::Parser::make_RPAR(sdfparse::location()); }
+{WS}+                                           { /* skip white space */ loc_.step(); }
+{ENDL}                                          { /* skip end-of-line */ loc_.lines(1); loc_.step(); }
 
-DELAYFILE                                       { cout << "DELAYFILE\n"; return sdfparse::Parser::make_DELAYFILE(sdfparse::location()); }
-SDFVERSION                                      { cout << "SDFVERSION\n"; return sdfparse::Parser::make_SDFVERSION(sdfparse::location()); }
-DIVIDER                                         { cout << "DIVIDER\n"; return sdfparse::Parser::make_DIVIDER(sdfparse::location()); }
-TIMESCALE                                       { cout << "TIMESCALE\n"; return sdfparse::Parser::make_TIMESCALE(sdfparse::location()); }
-CELL                                            { cout << "CELL\n"; return sdfparse::Parser::make_CELL(sdfparse::location()); }
-CELLTYPE                                        { cout << "CELLTYPE\n"; return sdfparse::Parser::make_CELLTYPE(sdfparse::location()); }
-INSTANCE                                        { cout << "INSTANCE\n"; return sdfparse::Parser::make_INSTANCE(sdfparse::location()); }
-DELAY                                           { cout << "DELAY\n"; return sdfparse::Parser::make_DELAY(sdfparse::location()); }
-ABSOLUTE                                        { cout << "ABSOLUTE\n"; return sdfparse::Parser::make_ABSOLUTE(sdfparse::location()); }
-IOPATH                                          { cout << "IOPATH\n"; return sdfparse::Parser::make_IOPATH(sdfparse::location()); }
-{COLON}                                         { cout << "COLON\n"; return sdfparse::Parser::make_COLON(sdfparse::location()); }
+\(                                              { cout << "LPAR\n"; return sdfparse::Parser::make_LPAR(loc_); }
+\)                                              { cout << "RPAR\n"; return sdfparse::Parser::make_RPAR(loc_); }
+
+DELAYFILE                                       { cout << "DELAYFILE\n"; return sdfparse::Parser::make_DELAYFILE(loc_); }
+SDFVERSION                                      { cout << "SDFVERSION\n"; return sdfparse::Parser::make_SDFVERSION(loc_); }
+DIVIDER                                         { cout << "DIVIDER\n"; return sdfparse::Parser::make_DIVIDER(loc_); }
+TIMESCALE                                       { cout << "TIMESCALE\n"; return sdfparse::Parser::make_TIMESCALE(loc_); }
+CELL                                            { cout << "CELL\n"; return sdfparse::Parser::make_CELL(loc_); }
+CELLTYPE                                        { cout << "CELLTYPE\n"; return sdfparse::Parser::make_CELLTYPE(loc_); }
+INSTANCE                                        { cout << "INSTANCE\n"; return sdfparse::Parser::make_INSTANCE(loc_); }
+DELAY                                           { cout << "DELAY\n"; return sdfparse::Parser::make_DELAY(loc_); }
+ABSOLUTE                                        { cout << "ABSOLUTE\n"; return sdfparse::Parser::make_ABSOLUTE(loc_); }
+IOPATH                                          { cout << "IOPATH\n"; return sdfparse::Parser::make_IOPATH(loc_); }
+{COLON}                                         { cout << "COLON\n"; return sdfparse::Parser::make_COLON(loc_); }
 [-+]?({DIGIT}*\.?{DIGIT}+|{DIGIT}+\.)           { 
                                                     cout << "Float: " << YYText() << "\n";
                                                     stringstream ss;
@@ -78,19 +88,24 @@ IOPATH                                          { cout << "IOPATH\n"; return sdf
                                                     double val;
                                                     ss >> val;
                                                     assert(!ss.fail() && ss.eof());
-                                                    return sdfparse::Parser::make_Float(val, sdfparse::location()); 
+                                                    return sdfparse::Parser::make_Float(val, loc_); 
                                                 }
 \"({ALPHA}|{DIGIT}|{SYMBOL})+\"                 {   
                                                     cout << "Qstring: " << YYText() << "\n"; 
-                                                    return sdfparse::Parser::make_Qstring(YYText(), sdfparse::location()); 
+                                                    return sdfparse::Parser::make_Qstring(YYText(), loc_); 
                                                 }
 ({ALPHA}|{SYMBOL})({ALPHA}|{DIGIT}|{SYMBOL})*   { 
                                                     cout << "String: " << YYText() << "\n"; 
-                                                    return sdfparse::Parser::make_String(YYText(), sdfparse::location()); 
+                                                    return sdfparse::Parser::make_String(YYText(), loc_); 
                                                 }
 
-.                                               { assert(false); }
+.                                               { 
+                                                    stringstream ss;
+                                                    ss << "SDF Error " << loc_ << ": Unexpected character '" << YYText() << "'";
+                                                    auto str = ss.str();
+                                                    LexerError(str.c_str());
+                                                }
 
-<<EOF>>                                         { cout << "EOF\n"; return sdfparse::Parser::make_EOF(sdfparse::location()); }
+<<EOF>>                                         { cout << "EOF\n"; return sdfparse::Parser::make_EOF(loc_); }
 
 %%

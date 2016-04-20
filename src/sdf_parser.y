@@ -104,10 +104,6 @@
 
 %start sdf_file
 
-%initial-action {
-    @$.begin.filename = @$.end.filename = &driver.filename_;
-};
-
 %%
 sdf_file : LPAR DELAYFILE sdf_data RPAR { }
          ;
@@ -159,5 +155,5 @@ delay_value : Float { }
 
 //We need to provide an implementation for parser error handling
 void sdfparse::Parser::error(const sdfparse::location& loc, const std::string& msg) {
-    std::cout << "SDF Parsing Error: " << msg << "\n";
+    std::cout << "SDF Error " << loc << ": " << msg << "\n";
 }
