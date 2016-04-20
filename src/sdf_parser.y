@@ -45,6 +45,9 @@
  */
 /*%define parse.lac full*/
 
+/* Track locations */
+%locations
+
 /* Generate a table of token names */
 %token-table
 
@@ -151,6 +154,6 @@ delay_value : Integer { }
 %%
 
 //We need to provide an implementation for parser error handling
-void sdfparse::Parser::error(const std::string& msg) {
+void sdfparse::Parser::error(const sdfparse::location& loc, const std::string& msg) {
     std::cout << "SDF Parsing Error: " << msg << "\n";
 }

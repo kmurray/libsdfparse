@@ -1,8 +1,9 @@
-#include <memory>
+#include <iostream>
 #include <fstream>
 
-#include "sdf_lexer.hpp"
-#include "sdf_parser.gen.hpp"
+//#include "sdf_lexer.hpp"
+//#include "sdf_parser.gen.hpp"
+#include "sdf_loader.hpp"
 
 int main(int argc, char** argv) {
 
@@ -12,19 +13,9 @@ int main(int argc, char** argv) {
     }
 
     std::ifstream is(argv[1]);
-    assert(is.good());
 
-    std::shared_ptr<sdfparse::Lexer> lexer = std::make_shared<sdfparse::Lexer>();
-    lexer->switch_streams(&is, nullptr);
-
-    //while(lexer->next_token() != 0) {}
-    //while(true) {
-        //lexer->next_token(); 
-    //}
-
-    sdfparse::Parser parser(*lexer);
-    auto result = parser.parse();
-    assert(result == 0);
+    sdfparse::Loader sdf_loader;
+    sdf_loader.load(is);
 
     return 0;
 }

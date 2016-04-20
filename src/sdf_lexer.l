@@ -4,6 +4,7 @@
     #include <cassert>
     #include "sdf_lexer.hpp"
     #include "sdf_parser.gen.hpp"
+    #include "location.hh"
 
     using std::cout;
     using std::stringstream;
@@ -56,20 +57,20 @@ ENDL (\n|\n\r)
 {WS}                                            { /* skip white space */ }
 {ENDL}                                          { /* skip end-of-line */ }
 
-\(                                              { cout << "LPAR\n"; return sdfparse::Parser::make_LPAR(); }
-\)                                              { cout << "RPAR\n"; return sdfparse::Parser::make_RPAR(); }
+\(                                              { cout << "LPAR\n"; return sdfparse::Parser::make_LPAR(sdfparse::location()); }
+\)                                              { cout << "RPAR\n"; return sdfparse::Parser::make_RPAR(sdfparse::location()); }
 
-DELAYFILE                                       { cout << "DELAYFILE\n"; return sdfparse::Parser::make_DELAYFILE(); }
-SDFVERSION                                      { cout << "SDFVERSION\n"; return sdfparse::Parser::make_SDFVERSION(); }
-DIVIDER                                         { cout << "DIVIDER\n"; return sdfparse::Parser::make_DIVIDER(); }
-TIMESCALE                                       { cout << "TIMESCALE\n"; return sdfparse::Parser::make_TIMESCALE(); }
-CELL                                            { cout << "CELL\n"; return sdfparse::Parser::make_CELL(); }
-CELLTYPE                                        { cout << "CELLTYPE\n"; return sdfparse::Parser::make_CELLTYPE(); }
-INSTANCE                                        { cout << "INSTANCE\n"; return sdfparse::Parser::make_INSTANCE(); }
-DELAY                                           { cout << "DELAY\n"; return sdfparse::Parser::make_DELAY(); }
-ABSOLUTE                                        { cout << "ABSOLUTE\n"; return sdfparse::Parser::make_ABSOLUTE(); }
-IOPATH                                          { cout << "IOPATH\n"; return sdfparse::Parser::make_IOPATH(); }
-{COLON}                                         { cout << "COLON\n"; return sdfparse::Parser::make_COLON(); }
+DELAYFILE                                       { cout << "DELAYFILE\n"; return sdfparse::Parser::make_DELAYFILE(sdfparse::location()); }
+SDFVERSION                                      { cout << "SDFVERSION\n"; return sdfparse::Parser::make_SDFVERSION(sdfparse::location()); }
+DIVIDER                                         { cout << "DIVIDER\n"; return sdfparse::Parser::make_DIVIDER(sdfparse::location()); }
+TIMESCALE                                       { cout << "TIMESCALE\n"; return sdfparse::Parser::make_TIMESCALE(sdfparse::location()); }
+CELL                                            { cout << "CELL\n"; return sdfparse::Parser::make_CELL(sdfparse::location()); }
+CELLTYPE                                        { cout << "CELLTYPE\n"; return sdfparse::Parser::make_CELLTYPE(sdfparse::location()); }
+INSTANCE                                        { cout << "INSTANCE\n"; return sdfparse::Parser::make_INSTANCE(sdfparse::location()); }
+DELAY                                           { cout << "DELAY\n"; return sdfparse::Parser::make_DELAY(sdfparse::location()); }
+ABSOLUTE                                        { cout << "ABSOLUTE\n"; return sdfparse::Parser::make_ABSOLUTE(sdfparse::location()); }
+IOPATH                                          { cout << "IOPATH\n"; return sdfparse::Parser::make_IOPATH(sdfparse::location()); }
+{COLON}                                         { cout << "COLON\n"; return sdfparse::Parser::make_COLON(sdfparse::location()); }
 [-+]?{DIGIT}+                                   {   
                                                     cout << "Integer: " << YYText() << "\n"; 
                                                     stringstream ss;
@@ -77,7 +78,7 @@ IOPATH                                          { cout << "IOPATH\n"; return sdf
                                                     int val;
                                                     ss >> val;
                                                     assert(!ss.fail() && ss.eof());
-                                                    return sdfparse::Parser::make_Integer(val); 
+                                                    return sdfparse::Parser::make_Integer(val, sdfparse::location()); 
                                                 }
 [-+]?({DIGIT}*\.?{DIGIT}+|{DIGIT}+\.)           { 
                                                     cout << "Float: " << YYText() << "\n";
@@ -86,19 +87,19 @@ IOPATH                                          { cout << "IOPATH\n"; return sdf
                                                     double val;
                                                     ss >> val;
                                                     assert(!ss.fail() && ss.eof());
-                                                    return sdfparse::Parser::make_Float(val); 
+                                                    return sdfparse::Parser::make_Float(val, sdfparse::location()); 
                                                 }
 \"({ALPHA}|{DIGIT}|{SYMBOL})+\"                 {   
                                                     cout << "Qstring: " << YYText() << "\n"; 
-                                                    return sdfparse::Parser::make_QuotedString(YYText()); 
+                                                    return sdfparse::Parser::make_QuotedString(YYText(), sdfparse::location()); 
                                                 }
 ({ALPHA}|{SYMBOL})({ALPHA}|{DIGIT}|{SYMBOL})*   { 
                                                     cout << "String: " << YYText() << "\n"; 
-                                                    return sdfparse::Parser::make_String(YYText()); 
+                                                    return sdfparse::Parser::make_String(YYText(), sdfparse::location()); 
                                                 }
 
 .                                               { assert(false); }
 
-<<EOF>>                                         { cout << "EOF\n"; return sdfparse::Parser::make_EOF(); }
+<<EOF>>                                         { cout << "EOF\n"; return sdfparse::Parser::make_EOF(sdfparse::location()); }
 
 %%
