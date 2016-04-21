@@ -12,6 +12,15 @@ class Lexer;
 class Parser;
 class ParseError;
 
+//Class for loading an SDF file.
+//
+//The sdf file can be parsed using load(), which returns true
+//if successful - after which the loaded data can be accessed via 
+//get_delayfile().
+//
+//The virtual method on_error() can be overriding to control
+//error handling. The default simply prints out an error message,
+//but it could also be defined to (re-)throw an exception.
 class Loader {
 
     public:
@@ -23,6 +32,7 @@ class Loader {
 
         const DelayFile& get_delayfile() { return delayfile_; };
 
+    protected:
         virtual void on_error(ParseError& error);
 
     private:

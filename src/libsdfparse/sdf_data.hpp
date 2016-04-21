@@ -8,8 +8,16 @@
 
 #include "sdf_data_fwd.hpp"
 
+//The classes defined in this file correspond (almost directly) to the 
+//structures in the SDF file.
+//
+//The key exception is that for simplicity some basic structures (e.g. CELLTYPE, INSTANCE)
+//have been folded into thier parents (e.g. CELL) as attributes.
+
 namespace sdfparse {
 
+    //A collection of three float values (e.g. "(1:2:3)" in SDF, corresponding to
+    //the min:typ:max values).
     class RealTriple {
         public:
             RealTriple()
@@ -36,10 +44,15 @@ namespace sdfparse {
     };
     std::ostream& operator<<(std::ostream& os, const RealTriple& val);
 
+    //An IOPATH delcaration
+    //
+    //Specifies the delay from input() to output() for both rise() and fall() 
+    //transitions
     class Iopath {
         public:
             Iopath() = default;
-            Iopath(const std::string& new_input, const std::string& new_output, RealTriple new_rise, RealTriple new_fall)
+            Iopath(const std::string& new_input, const std::string& new_output, 
+                   RealTriple new_rise, RealTriple new_fall)
                 : input_(new_input)
                 , output_(new_output)
                 , rise_(new_rise)
@@ -60,6 +73,9 @@ namespace sdfparse {
     };
 
 
+    //A Delay declaration
+    //
+    //It consists of a type() and list of iopaths()
     class Delay {
         public:
             enum class Type {
@@ -82,6 +98,9 @@ namespace sdfparse {
     };
     std::ostream& operator<<(std::ostream& os, const Delay::Type& type);
 
+    //A CELL definition
+    //
+    //It consists of a celltype(), instance() and delay()
     class Cell {
         public:
             Cell() = default;
@@ -102,6 +121,9 @@ namespace sdfparse {
             Delay delay_;
     };
 
+    //A TIMESCALE definition
+    //
+    //It has a value() and unit()
     class Timescale {
         public:
             Timescale(double new_value=1., const std::string& new_unit="ns")
@@ -118,6 +140,9 @@ namespace sdfparse {
             std::string unit_;
     };
 
+    //The header (i.e. metadata) for an SDF file.
+    //
+    //Including the sdfversion(), hierarchical divider() and timescale()
     class Header {
         public:
             Header(const std::string& new_sdfversion="", const std::string& new_divider=".", const Timescale& new_timescale=Timescale(1., "ns"))
@@ -140,6 +165,11 @@ namespace sdfparse {
             Timescale timescale_;
     };
 
+    //A DELAYFILE definition
+    //
+    //This contains all the data included in the parsed SDF file.
+    //
+    //Organized as a header(), and list of cells().
     class DelayFile {
         public:
             DelayFile(const Header& new_header=Header(), const std::vector<Cell>& new_cells=std::vector<Cell>())
