@@ -122,7 +122,8 @@
 %start sdf_file
 
 %%
-sdf_file : LPAR DELAYFILE sdf_header cell_list RPAR { driver.delayfile_ = DelayFile($3, $4); }
+sdf_file : LPAR DELAYFILE sdf_header RPAR { driver.delayfile_ = DelayFile($3); }
+         | LPAR DELAYFILE sdf_header cell_list RPAR { driver.delayfile_ = DelayFile($3, $4); }
          ;
 
 sdf_header : sdf_version                    { $$ = Header($1); }
@@ -131,7 +132,7 @@ sdf_header : sdf_version                    { $$ = Header($1); }
            ;
 
 cell_list : cell { $$ = std::vector<Cell>(); $$.push_back($1); }
-          | cell_list cell { $1.push_back($2); $$ = $1; }
+          | cell_list cell  { $1.push_back($2); $$ = $1; }
           ;
 
 sdf_version : LPAR SDFVERSION Qstring RPAR { $$ = $3; }
@@ -156,9 +157,10 @@ delay : LPAR DELAY absolute RPAR { $$ = Delay(Delay::Type::ABSOLUTE, $3); }
       ;
 
 absolute : LPAR ABSOLUTE iopath_list RPAR { $$ = $3; }
+         /*| LPAR ABSOLUTE RPAR { $$ = std::vector<Iopath>(); } */
          ;
 
-iopath_list : /* empty */        { $$ = std::vector<Iopath>(); }
+iopath_list : iopath             { $$ = std::vector<Iopath>(); $$.push_back($1); }
             | iopath_list iopath { $1.push_back($2); $$ = $1; }
             ;
 
