@@ -156,8 +156,8 @@ instance : LPAR INSTANCE String RPAR { $$ = $3; }
 delay : LPAR DELAY absolute RPAR { $$ = Delay(Delay::Type::ABSOLUTE, $3); }
       ;
 
-absolute : LPAR ABSOLUTE iopath_list RPAR { $$ = $3; }
-         /*| LPAR ABSOLUTE RPAR { $$ = std::vector<Iopath>(); } */
+absolute : LPAR ABSOLUTE RPAR { $$ = std::vector<Iopath>(); } 
+         | LPAR ABSOLUTE iopath_list RPAR { $$ = $3; }
          ;
 
 iopath_list : iopath             { $$ = std::vector<Iopath>(); $$.push_back($1); }
