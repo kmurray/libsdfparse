@@ -9,9 +9,9 @@ namespace sdfparse {
 
 class ParseError : public std::runtime_error {
     public:
-        ParseError(const std::string& msg, location loc)
+        ParseError(const std::string& msg, location new_loc)
             : std::runtime_error(msg)
-            , loc_(loc)
+            , loc_(new_loc)
             {}
 
         location loc() { return loc_; }

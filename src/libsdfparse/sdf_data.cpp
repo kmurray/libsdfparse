@@ -1,11 +1,15 @@
 #include "sdf_data.hpp"
 #include <iostream>
 
-namespace sdfparse {
+namespace /*anonymous*/ {
+    std::string ident(int depth);
 
     std::string ident(int depth) {
         return std::string(2*depth, ' ');
     }
+}
+namespace sdfparse {
+
 
     void DelayFile::print(std::ostream& os, int depth) const {
         os << ident(depth) << "(DELAYFILE\n";

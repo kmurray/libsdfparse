@@ -17,10 +17,10 @@ namespace sdfparse {
                 , typ_(std::numeric_limits<double>::quiet_NaN())
                 , max_(std::numeric_limits<double>::quiet_NaN())
                 {}
-            RealTriple(double min, double typ, double max)
-                : min_(min)
-                , typ_(typ)
-                , max_(max)
+            RealTriple(double new_min, double new_typ, double new_max)
+                : min_(new_min)
+                , typ_(new_typ)
+                , max_(new_max)
                 {}
 
             double min() const { return min_; }
@@ -39,11 +39,11 @@ namespace sdfparse {
     class Iopath {
         public:
             Iopath() = default;
-            Iopath(const std::string& input, const std::string& output, RealTriple rise, RealTriple fall)
-                : input_(input)
-                , output_(output)
-                , rise_(rise)
-                , fall_(fall)
+            Iopath(const std::string& new_input, const std::string& new_output, RealTriple new_rise, RealTriple new_fall)
+                : input_(new_input)
+                , output_(new_output)
+                , rise_(new_rise)
+                , fall_(new_fall)
                 {}
 
             const std::string& input() const { return input_; }
@@ -67,9 +67,9 @@ namespace sdfparse {
             };
 
             Delay() = default;
-            Delay(Delay::Type type, std::vector<Iopath> iopaths)
-                : type_(type)
-                , iopaths_(iopaths)
+            Delay(Delay::Type new_type, std::vector<Iopath> new_iopaths)
+                : type_(new_type)
+                , iopaths_(new_iopaths)
                 {}
 
             Delay::Type type() const { return type_; }
@@ -85,10 +85,10 @@ namespace sdfparse {
     class Cell {
         public:
             Cell() = default;
-            Cell(const std::string& celltype, const std::string& instance, Delay delay)
-                : celltype_(celltype)
-                , instance_(instance)
-                , delay_(delay)
+            Cell(const std::string& new_celltype, const std::string& new_instance, Delay new_delay)
+                : celltype_(new_celltype)
+                , instance_(new_instance)
+                , delay_(new_delay)
                 {}
 
                 const std::string& celltype() const { return celltype_; }
@@ -104,9 +104,9 @@ namespace sdfparse {
 
     class Timescale {
         public:
-            Timescale(double value=1., const std::string& unit="ns")
-                : value_(value)
-                , unit_(unit)
+            Timescale(double new_value=1., const std::string& new_unit="ns")
+                : value_(new_value)
+                , unit_(new_unit)
                 {}
 
             double value() const { return value_; }
@@ -120,18 +120,18 @@ namespace sdfparse {
 
     class Header {
         public:
-            Header(const std::string& sdfversion="", const std::string& divider=".", const Timescale& timescale=Timescale(1., "ns"))
-                : sdfversion_(sdfversion)
-                , divider_(divider)
-                , timescale_(timescale)
+            Header(const std::string& new_sdfversion="", const std::string& new_divider=".", const Timescale& new_timescale=Timescale(1., "ns"))
+                : sdfversion_(new_sdfversion)
+                , divider_(new_divider)
+                , timescale_(new_timescale)
                 {}
 
             const std::string& sdfversion() const { return sdfversion_; }
             const std::string& divider() const { return divider_; }
             const Timescale& timescale() const { return timescale_; }
 
-            void set_divider(const std::string& divider) { divider_ = divider; }
-            void set_timescale(const Timescale& timescale) { timescale_ = timescale; }
+            void set_divider(const std::string& new_divider) { divider_ = new_divider; }
+            void set_timescale(const Timescale& new_timescale) { timescale_ = new_timescale; }
 
             void print(std::ostream& os, int depth=0) const;
         private:
@@ -142,9 +142,9 @@ namespace sdfparse {
 
     class DelayFile {
         public:
-            DelayFile(const Header& header=Header(), const std::vector<Cell>& cells=std::vector<Cell>())
-                : header_(header)
-                , cells_(cells)
+            DelayFile(const Header& new_header=Header(), const std::vector<Cell>& new_cells=std::vector<Cell>())
+                : header_(new_header)
+                , cells_(new_cells)
                 {}
 
             const Header& header() const { return header_; }
