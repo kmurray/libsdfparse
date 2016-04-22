@@ -68,5 +68,8 @@ namespace sdfparse {
         os << "(" << val.min() << ":" << val.typ() << ":" << val.max() << ")";
         return os;
     }
+    bool operator==(const RealTriple& lhs, const RealTriple& rhs) {
+        return lhs.min() == rhs.min() && lhs.typ() == rhs.typ() && lhs.max() == rhs.max();
+    }
 
 } //sdfparse

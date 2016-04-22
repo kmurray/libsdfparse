@@ -43,6 +43,7 @@ namespace sdfparse {
             double max_;
     };
     std::ostream& operator<<(std::ostream& os, const RealTriple& val);
+    bool operator==(const RealTriple& lhs, const RealTriple& rhs);
 
     //An IOPATH delcaration
     //
