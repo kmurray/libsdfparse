@@ -90,7 +90,7 @@ IOPATH                                          { /* cout << "IOPATH\n"; */ retu
 
                                                     if(ss.fail() || !ss.eof()) {
                                                         stringstream msg_ss;
-                                                        ss << "Failed to parse float number '" << YYText() << "'";
+                                                        msg_ss << "Failed to parse float number '" << YYText() << "'";
                                                         throw sdfparse::ParseError(msg_ss.str(), loc_);
                                                     }
 
