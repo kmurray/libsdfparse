@@ -14,8 +14,6 @@
     //of the token.
     #define YY_USER_ACTION loc_.columns(YYLeng());
 
-    #define yyterminate() sdfparse::Parser::make_EOF(loc_)
-
 %}
 
 /* Generate a C++ lexer */
@@ -89,7 +87,13 @@ IOPATH                                          { /* cout << "IOPATH\n"; */ retu
                                                     ss << YYText();
                                                     double val;
                                                     ss >> val;
-                                                    assert(!ss.fail() && ss.eof());
+
+                                                    if(ss.fail() || !ss.eof()) {
+                                                        stringstream msg_ss;
+                                                        ss << "Failed to parse float number '" << YYText() << "'";
+                                                        throw sdfparse::ParseError(msg_ss.str(), loc_);
+                                                    }
+
                                                     return sdfparse::Parser::make_Float(val, loc_); 
                                                 }
 \"({ALPHA}|{DIGIT}|{SYMBOL})+\"                 {   
@@ -113,7 +117,7 @@ IOPATH                                          { /* cout << "IOPATH\n"; */ retu
 
 <<EOF>>                                         { 
                                                     /*cout << "EOF\n";*/
-                                                    return yyterminate(); 
+                                                    return sdfparse::Parser::make_EOF(loc_);
                                                 }
 
 %%
