@@ -153,15 +153,27 @@ namespace sdfparse {
                 {}
 
             const std::string& sdfversion() const { return sdfversion_; }
+            const std::string& design() const { return design_; }
+            const std::string& vendor() const { return vendor_; }
+            const std::string& program() const { return program_; }
+            const std::string& version() const { return version_; }
             const std::string& divider() const { return divider_; }
             const Timescale& timescale() const { return timescale_; }
 
+            void set_design(const std::string& new_design) { design_ = new_design; }
+            void set_vendor(const std::string& new_vendor) { vendor_ = new_vendor; }
+            void set_program(const std::string& new_program) { program_ = new_program; }
+            void set_version(const std::string& new_version) { version_ = new_version; }
             void set_divider(const std::string& new_divider) { divider_ = new_divider; }
             void set_timescale(const Timescale& new_timescale) { timescale_ = new_timescale; }
 
             void print(std::ostream& os, int depth=0) const;
         private:
             std::string sdfversion_;
+            std::string design_;
+            std::string vendor_;
+            std::string program_;
+            std::string version_;
             std::string divider_;
             Timescale timescale_;
     };

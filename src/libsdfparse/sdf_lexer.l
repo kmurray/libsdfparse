@@ -72,6 +72,10 @@ ENDL (\n|\n\r)
 
 DELAYFILE                                       { /* cout << "DELAYFILE\n"; */ return sdfparse::Parser::make_DELAYFILE(loc_); }
 SDFVERSION                                      { /* cout << "SDFVERSION\n"; */ return sdfparse::Parser::make_SDFVERSION(loc_); }
+DESIGN                                          { /* cout << "DESIGN\n"; */ return sdfparse::Parser::make_DESIGN(loc_); }
+VENDOR                                          { /* cout << "VENDOR\n"; */ return sdfparse::Parser::make_VENDOR(loc_); }
+PROGRAM                                         { /* cout << "PROGRAM\n"; */ return sdfparse::Parser::make_PROGRAM(loc_); }
+VERSION                                         { /* cout << "VERSION\n"; */ return sdfparse::Parser::make_VERSION(loc_); }
 DIVIDER                                         { /* cout << "DIVIDER\n"; */ return sdfparse::Parser::make_DIVIDER(loc_); }
 TIMESCALE                                       { /* cout << "TIMESCALE\n"; */ return sdfparse::Parser::make_TIMESCALE(loc_); }
 CELL                                            { /* cout << "CELL\n"; */ return sdfparse::Parser::make_CELL(loc_); }

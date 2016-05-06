@@ -25,6 +25,10 @@ namespace sdfparse {
 
     void Header::print(std::ostream& os, int depth) const {
         os << ident(depth) << "(SDFVERSION \"" << sdfversion() << "\")\n";
+        os << ident(depth) << "(DESIGN \"" << design() << "\")\n";
+        os << ident(depth) << "(VENDOR \"" << vendor() << "\")\n";
+        os << ident(depth) << "(PROGRAM \"" << program() << "\")\n";
+        os << ident(depth) << "(VERSION \"" << version() << "\")\n";
         os << ident(depth) << "(DIVIDER " << divider() << ")\n";
         timescale().print(os, depth);
     }

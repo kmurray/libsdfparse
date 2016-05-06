@@ -90,6 +90,10 @@
 %token RPAR ")"
 %token DELAYFILE "DELAYFILE"
 %token SDFVERSION "SDFVERSION"
+%token DESIGN "DESIGN"
+%token VENDOR "VENDOR"
+%token PROGRAM "PROGRAM"
+%token VERSION "VERSION"
 %token DIVIDER "DIVIDER"
 %token TIMESCALE "TIMESCALE"
 %token CELL "CELL"
@@ -114,6 +118,10 @@
 %type <Cell> cell
 %type <Timescale> timescale
 %type <std::string> hierarchy_divider
+%type <std::string> version
+%type <std::string> program
+%type <std::string> vendor
+%type <std::string> design
 %type <std::string> sdf_version
 %type <Header> sdf_header
 %type <std::vector<Cell>> cell_list
@@ -127,6 +135,10 @@ sdf_file : LPAR DELAYFILE sdf_header RPAR { driver.delayfile_ = DelayFile($3); }
          ;
 
 sdf_header : sdf_version                    { $$ = Header($1); }
+           | sdf_header design              { $1.set_design($2); $$ = $1; }
+           | sdf_header vendor              { $1.set_vendor($2); $$ = $1; }
+           | sdf_header program             { $1.set_program($2); $$ = $1; }
+           | sdf_header version             { $1.set_version($2); $$ = $1; }
            | sdf_header hierarchy_divider   { $1.set_divider($2); $$ = $1; }
            | sdf_header timescale           { $1.set_timescale($2); $$ = $1; }
            ;
@@ -137,6 +149,18 @@ cell_list : cell { $$ = std::vector<Cell>(); $$.push_back($1); }
 
 sdf_version : LPAR SDFVERSION Qstring RPAR { $$ = $3; }
             ;
+
+design : LPAR DESIGN Qstring RPAR { $$ = $3; }
+       ;
+
+vendor : LPAR VENDOR Qstring RPAR { $$ = $3; }
+       ;
+
+program : LPAR PROGRAM Qstring RPAR { $$ = $3; }
+        ;
+
+version : LPAR VERSION Qstring RPAR { $$ = $3; }
+        ;
 
 hierarchy_divider : LPAR DIVIDER String RPAR { $$ = $3; }
                   ;
