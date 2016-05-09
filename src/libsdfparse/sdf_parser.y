@@ -169,6 +169,7 @@ timescale : LPAR TIMESCALE Float String RPAR { $$ = Timescale($3, $4); }
           ;
 
 cell : LPAR CELL celltype instance delay RPAR { $$ = Cell($3, $4, $5); }
+     | LPAR CELL celltype instance RPAR { $$ = Cell($3, $4, Delay()); }
      ;
 
 celltype : LPAR CELLTYPE Qstring RPAR { $$ = $3; }

@@ -46,13 +46,15 @@ namespace sdfparse {
     }
 
     void Delay::print(std::ostream& os, int depth) const {
-        os << ident(depth) << "(DELAY\n";
-        os << ident(depth+1) << "(" << type() << "\n";
-        for(auto& iopath : iopaths()) {
-            iopath.print(os, depth+2);
+        if(!iopaths_.empty()) {
+            os << ident(depth) << "(DELAY\n";
+            os << ident(depth+1) << "(" << type() << "\n";
+            for(auto& iopath : iopaths()) {
+                iopath.print(os, depth+2);
+            }
+            os << ident(depth+1) << ")\n";
+            os << ident(depth) << ")\n";
         }
-        os << ident(depth+1) << ")\n";
-        os << ident(depth) << ")\n";
     }
 
     std::ostream& operator<<(std::ostream& os, const Delay::Type& type) {
