@@ -193,7 +193,8 @@ iopath : LPAR IOPATH String String real_triple real_triple RPAR { $$ = Iopath($3
        ;
 
 real_triple : LPAR Float COLON Float COLON Float RPAR { $$ = RealTriple($2, $4, $6); }
-             ;
+            | LPAR RPAR { $$ = RealTriple(); }
+            ;
 
 %%
 

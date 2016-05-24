@@ -1,5 +1,6 @@
 #include "sdf_data.hpp"
 #include <iostream>
+#include <cmath>
 
 namespace /*anonymous*/ {
     std::string ident(int depth);
@@ -71,7 +72,11 @@ namespace sdfparse {
     }
 
     std::ostream& operator<<(std::ostream& os, const RealTriple& val) {
-        os << "(" << val.min() << ":" << val.typ() << ":" << val.max() << ")";
+        if(std::isnan(val.min()) && std::isnan(val.typ()) && std::isnan(val.max())) {
+            os << "()";
+        } else {
+            os << "(" << val.min() << ":" << val.typ() << ":" << val.max() << ")";
+        }
         return os;
     }
     bool operator==(const RealTriple& lhs, const RealTriple& rhs) {
