@@ -103,18 +103,30 @@
 %token ABSOLUTE "ABSOLUTE"
 %token IOPATH "IOPATH"
 %token COLON ":"
+%token POSEDGE "posedge"
+%token NEGEDGE "negedge"
+%token SETUP "SETUP"
+%token HOLD "HOLD"
+%token TIMINGCHECK "TIMINGCHECK"
 %token <double> Float "float"
 %token <std::string> String "string"
 %token <std::string> Qstring "quoted-string"
 %token EOF 0 "end-of-file"
 
 %type <RealTriple> real_triple
+%type <PortSpec> port_spec
 %type <Iopath> iopath
 %type <std::vector<Iopath>> iopath_list
 %type <std::vector<Iopath>> absolute
 %type <Delay> delay
 %type <std::string> instance
 %type <std::string> celltype
+%type <PortCondition> port_condition
+%type <TimingCheck> timing_check
+%type <Setup> setup_check
+%type <std::vector<Setup>> setup_check_list
+%type <Hold> hold_check
+%type <std::vector<Hold>> hold_check_list
 %type <Cell> cell
 %type <Timescale> timescale
 %type <std::string> hierarchy_divider
@@ -168,8 +180,9 @@ hierarchy_divider : LPAR DIVIDER String RPAR { $$ = $3; }
 timescale : LPAR TIMESCALE Float String RPAR { $$ = Timescale($3, $4); }
           ;
 
-cell : LPAR CELL celltype instance delay RPAR { $$ = Cell($3, $4, $5); }
-     | LPAR CELL celltype instance RPAR { $$ = Cell($3, $4, Delay()); }
+cell : LPAR CELL celltype instance delay timing_check RPAR { $$ = Cell($3, $4, $5, $6); }
+     | LPAR CELL celltype instance delay RPAR { $$ = Cell($3, $4, $5, TimingCheck()); }
+     | LPAR CELL celltype instance RPAR { $$ = Cell($3, $4, Delay(), TimingCheck()); }
      ;
 
 celltype : LPAR CELLTYPE Qstring RPAR { $$ = $3; }
@@ -177,6 +190,23 @@ celltype : LPAR CELLTYPE Qstring RPAR { $$ = $3; }
 
 instance : LPAR INSTANCE String RPAR { $$ = $3; }
          ;
+
+timing_check : LPAR TIMINGCHECK setup_check_list RPAR { $$ = TimingCheck($3, std::vector<Hold>()); }
+             | LPAR TIMINGCHECK setup_check_list hold_check_list RPAR { $$ = TimingCheck($3, $4); }
+             ;
+
+hold_check_list : hold_check { $$ = std::vector<Hold>(); $$.push_back($1); }
+                | hold_check_list hold_check { $$ = $1; $$.push_back($2); }
+                ;
+
+hold_check : LPAR HOLD port_spec port_spec real_triple RPAR { $$ = Hold($4, $3, $5); }
+
+setup_check_list : setup_check { $$ = std::vector<Setup>(); $$.push_back($1); }
+                 | setup_check_list setup_check { $$ = $1; $$.push_back($2); }
+                 ;
+
+setup_check : LPAR SETUP port_spec port_spec real_triple RPAR { $$ = Setup($4, $3, $5); }
+
 
 delay : LPAR DELAY absolute RPAR { $$ = Delay(Delay::Type::ABSOLUTE, $3); }
       ;
@@ -189,8 +219,16 @@ iopath_list : iopath             { $$ = std::vector<Iopath>(); $$.push_back($1);
             | iopath_list iopath { $1.push_back($2); $$ = $1; }
             ;
 
-iopath : LPAR IOPATH String String real_triple real_triple RPAR { $$ = Iopath($3, $4, $5, $6); }
+iopath : LPAR IOPATH port_spec port_spec real_triple real_triple RPAR { $$ = Iopath($3, $4, $5, $6); }
        ;
+
+port_spec : String { $$ = PortSpec($1, PortCondition::NONE); }
+          | LPAR port_condition String RPAR { $$ = PortSpec($3, $2); }
+          ;
+
+port_condition: POSEDGE { $$ = PortCondition::POSEDGE; }
+              | NEGEDGE { $$ = PortCondition::NEGEDGE; }
+              ;
 
 real_triple : LPAR Float COLON Float COLON Float RPAR { $$ = RealTriple($2, $4, $6); }
             | LPAR RPAR { $$ = RealTriple(); }

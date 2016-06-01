@@ -45,6 +45,31 @@ namespace sdfparse {
     std::ostream& operator<<(std::ostream& os, const RealTriple& val);
     bool operator==(const RealTriple& lhs, const RealTriple& rhs);
 
+    enum class PortCondition {
+        POSEDGE,
+        NEGEDGE,
+        NONE
+    };
+    std::ostream& operator<<(std::ostream& os, const PortCondition& val);
+
+    class PortSpec {
+        public:
+            PortSpec() = default;
+            PortSpec(std::string port_name, PortCondition port_condition)
+                : port_(port_name)
+                , condition_(port_condition)
+                {}
+
+            std::string port() const { return port_; }
+            PortCondition condition() const { return condition_; }
+
+        private:
+            std::string port_;
+            PortCondition condition_;
+    };
+    std::ostream& operator<<(std::ostream& os, const PortSpec& val);
+
+
     //An IOPATH delcaration
     //
     //Specifies the delay from input() to output() for both rise() and fall() 
@@ -52,27 +77,82 @@ namespace sdfparse {
     class Iopath {
         public:
             Iopath() = default;
-            Iopath(const std::string& new_input, const std::string& new_output, 
-                   RealTriple new_rise, RealTriple new_fall)
+            Iopath(PortSpec new_input, PortSpec new_output, RealTriple new_rise, RealTriple new_fall)
                 : input_(new_input)
                 , output_(new_output)
                 , rise_(new_rise)
                 , fall_(new_fall)
                 {}
 
-            const std::string& input() const { return input_; }
-            const std::string& output() const { return output_; }
+            const PortSpec& input() const { return input_; }
+            const PortSpec& output() const { return output_; }
             const RealTriple& rise() const { return rise_; }
             const RealTriple& fall() const { return fall_; }
 
             void print(std::ostream& os, int depth=0) const;
         private:
-            std::string input_;
-            std::string output_;
+            PortSpec input_;
+            PortSpec output_;
             RealTriple rise_;
             RealTriple fall_;
     };
 
+    class Setup {
+        public:
+            Setup() = default;
+            Setup(PortSpec clock_spec, PortSpec port_spec, RealTriple tsu_value)
+                : clock_(clock_spec)
+                , port_(port_spec)
+                , tsu_(tsu_value)
+                {}
+
+            const PortSpec& clock() const { return clock_; }
+            const PortSpec& port() const { return port_; }
+            RealTriple tsu() const { return tsu_; }
+
+            void print(std::ostream& os, int depth=0) const;
+        private:
+            PortSpec clock_;
+            PortSpec port_;
+            RealTriple tsu_;
+    };
+
+    class Hold {
+        public:
+            Hold() = default;
+            Hold(PortSpec clock_spec, PortSpec port_spec, RealTriple thld_value)
+                : clock_(clock_spec)
+                , port_(port_spec)
+                , thld_(thld_value)
+                {}
+
+            const PortSpec& clock() const { return clock_; }
+            const PortSpec& port() const { return port_; }
+            RealTriple thld() const { return thld_; }
+
+            void print(std::ostream& os, int depth=0) const;
+        private:
+            PortSpec clock_;
+            PortSpec port_;
+            RealTriple thld_;
+    };
+
+    class TimingCheck {
+        public:
+            TimingCheck() = default;
+            TimingCheck(std::vector<Setup> setup_checks_vec, std::vector<Hold> hold_checks_vec)
+                : setup_checks_(setup_checks_vec)
+                , hold_checks_(hold_checks_vec)
+                {}
+
+            std::vector<Setup> setup() const { return setup_checks_; }
+            std::vector<Hold> hold() const { return hold_checks_; }
+
+            void print(std::ostream& os, int depth=0) const;
+        private:
+            std::vector<Setup> setup_checks_;
+            std::vector<Hold> hold_checks_;
+    };
 
     //A Delay declaration
     //
@@ -105,21 +185,24 @@ namespace sdfparse {
     class Cell {
         public:
             Cell() = default;
-            Cell(const std::string& new_celltype, const std::string& new_instance, Delay new_delay)
+            Cell(const std::string& new_celltype, const std::string& new_instance, Delay new_delay, TimingCheck timing_check_value)
                 : celltype_(new_celltype)
                 , instance_(new_instance)
                 , delay_(new_delay)
+                , timing_check_(timing_check_value)
                 {}
 
                 const std::string& celltype() const { return celltype_; }
                 const std::string& instance() const { return instance_; }
                 const Delay& delay() const { return delay_; }
+                const TimingCheck& timing_check() const { return timing_check_; }
 
                 void print(std::ostream& os, int depth=0) const;
         private:
             std::string celltype_;
             std::string instance_;
             Delay delay_;
+            TimingCheck timing_check_;
     };
 
     //A TIMESCALE definition

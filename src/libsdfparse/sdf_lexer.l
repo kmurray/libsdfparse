@@ -85,6 +85,11 @@ DELAY                                           { /* cout << "DELAY\n"; */ retur
 ABSOLUTE                                        { /* cout << "ABSOLUTE\n"; */ return sdfparse::Parser::make_ABSOLUTE(loc_); }
 IOPATH                                          { /* cout << "IOPATH\n"; */ return sdfparse::Parser::make_IOPATH(loc_); }
 {COLON}                                         { /* cout << "COLON\n"; */ return sdfparse::Parser::make_COLON(loc_); }
+posedge                                         { return sdfparse::Parser::make_POSEDGE(loc_); }
+negedge                                         { return sdfparse::Parser::make_NEGEDGE(loc_); }
+SETUP                                           { return sdfparse::Parser::make_SETUP(loc_); }
+HOLD                                            { return sdfparse::Parser::make_HOLD(loc_); }
+TIMINGCHECK                                     { return sdfparse::Parser::make_TIMINGCHECK(loc_); }
 [-+]?({DIGIT}*\.?{DIGIT}+|{DIGIT}+\.)           { 
                                                     /*cout << "Float: " << YYText() << "\n";*/
                                                     stringstream ss;
