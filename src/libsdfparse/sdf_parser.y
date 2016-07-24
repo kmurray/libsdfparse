@@ -75,6 +75,7 @@
 
     #include "sdf_lexer.hpp"
     #include "sdf_loader.hpp"
+    #include "sdf_escape.hpp"
 
     //Bison calls yylex() to get the next token.
     //Since we have re-defined the equivalent function in the lexer
@@ -113,6 +114,8 @@
 %token <std::string> Qstring "quoted-string"
 %token EOF 0 "end-of-file"
 
+%type <std::string> Id "identifier"
+%type <std::string> Qid "quoted-identifier"
 %type <RealTriple> real_triple
 %type <PortSpec> port_spec
 %type <Iopath> iopath
@@ -159,25 +162,25 @@ cell_list : cell { $$ = std::vector<Cell>(); $$.push_back($1); }
           | cell_list cell  { $1.push_back($2); $$ = $1; }
           ;
 
-sdf_version : LPAR SDFVERSION Qstring RPAR { $$ = $3; }
+sdf_version : LPAR SDFVERSION Qid RPAR { $$ = $3; }
             ;
 
-design : LPAR DESIGN Qstring RPAR { $$ = $3; }
+design : LPAR DESIGN Qid RPAR { $$ = $3; }
        ;
 
-vendor : LPAR VENDOR Qstring RPAR { $$ = $3; }
+vendor : LPAR VENDOR Qid RPAR { $$ = $3; }
        ;
 
-program : LPAR PROGRAM Qstring RPAR { $$ = $3; }
+program : LPAR PROGRAM Qid RPAR { $$ = $3; }
         ;
 
-version : LPAR VERSION Qstring RPAR { $$ = $3; }
+version : LPAR VERSION Qid RPAR { $$ = $3; }
         ;
 
-hierarchy_divider : LPAR DIVIDER String RPAR { $$ = $3; }
+hierarchy_divider : LPAR DIVIDER Id RPAR { $$ = $3; }
                   ;
 
-timescale : LPAR TIMESCALE Float String RPAR { $$ = Timescale($3, $4); }
+timescale : LPAR TIMESCALE Float Id RPAR { $$ = Timescale($3, $4); }
           ;
 
 cell : LPAR CELL celltype instance delay timing_check RPAR { $$ = Cell($3, $4, $5, $6); }
@@ -185,10 +188,10 @@ cell : LPAR CELL celltype instance delay timing_check RPAR { $$ = Cell($3, $4, $
      | LPAR CELL celltype instance RPAR { $$ = Cell($3, $4, Delay(), TimingCheck()); }
      ;
 
-celltype : LPAR CELLTYPE Qstring RPAR { $$ = $3; }
+celltype : LPAR CELLTYPE Qid RPAR { $$ = $3; }
          ;
 
-instance : LPAR INSTANCE String RPAR { $$ = $3; }
+instance : LPAR INSTANCE Id RPAR { $$ = $3; }
          ;
 
 timing_check : LPAR TIMINGCHECK setup_check_list RPAR { $$ = TimingCheck($3, std::vector<Hold>()); }
@@ -222,8 +225,8 @@ iopath_list : iopath             { $$ = std::vector<Iopath>(); $$.push_back($1);
 iopath : LPAR IOPATH port_spec port_spec real_triple real_triple RPAR { $$ = Iopath($3, $4, $5, $6); }
        ;
 
-port_spec : String { $$ = PortSpec($1, PortCondition::NONE); }
-          | LPAR port_condition String RPAR { $$ = PortSpec($3, $2); }
+port_spec : Id { $$ = PortSpec($1, PortCondition::NONE); }
+          | LPAR port_condition Id RPAR { $$ = PortSpec($3, $2); }
           ;
 
 port_condition: POSEDGE { $$ = PortCondition::POSEDGE; }
@@ -233,6 +236,9 @@ port_condition: POSEDGE { $$ = PortCondition::POSEDGE; }
 real_triple : LPAR Float COLON Float COLON Float RPAR { $$ = RealTriple($2, $4, $6); }
             | LPAR RPAR { $$ = RealTriple(); }
             ;
+
+Id : String { $$ = unescape_sdf_identifier($1); }
+Qid : Qstring { $$ = unescape_sdf_identifier($1); }
 
 %%
 

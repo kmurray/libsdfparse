@@ -51,7 +51,7 @@
 
 /* Character classes */
 ALPHA [a-zA-Z]
-SYMBOL [-_~|*/\[\]\.\{\}^+$/]
+SYMBOL [-_~|*/\[\]\.\{\}^+$/\\]
 DIGIT [0-9]
 COLON [:]
 WS [ \t]

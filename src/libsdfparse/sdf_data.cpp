@@ -1,4 +1,5 @@
 #include "sdf_data.hpp"
+#include "sdf_escape.hpp"
 #include <iostream>
 #include <cmath>
 
@@ -40,8 +41,8 @@ namespace sdfparse {
 
     void Cell::print(std::ostream& os, int depth) const {
         os << ident(depth) << "(CELL\n";
-        os << ident(depth+1) << "(CELLTYPE \"" << celltype() << "\")\n";
-        os << ident(depth+1) << "(INSTANCE " << instance() << ")\n";
+        os << ident(depth+1) << "(CELLTYPE \"" << escape_sdf_identifier(celltype()) << "\")\n";
+        os << ident(depth+1) << "(INSTANCE " << escape_sdf_identifier(instance()) << ")\n";
         delay().print(os, depth+1);
         timing_check().print(os, depth+1);
         os << ident(depth) << ")\n";
@@ -108,7 +109,7 @@ namespace sdfparse {
         if(port_spec.condition() != PortCondition::NONE) {
             os << "(" << port_spec.condition() << " ";
         }
-        os << port_spec.port();
+        os << escape_sdf_identifier(port_spec.port(), EscapeStyle::EXCLUDE_LAST_INDEX);
         if(port_spec.condition() != PortCondition::NONE) {
             os << ")";
         }
