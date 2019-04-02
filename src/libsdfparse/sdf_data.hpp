@@ -161,25 +161,15 @@ namespace sdfparse {
     class TimingCheck {
         public:
             TimingCheck() = default;
-            TimingCheck(std::vector<Setup> setup_checks_vec, std::vector<Hold> hold_checks_vec,
-                    std::vector<Removal> removal_checks_vec, std::vector<Recovery> recovery_checks_vec)
-                : setup_checks_(setup_checks_vec)
-                , hold_checks_(hold_checks_vec)
-                , removal_checks_(removal_checks_vec)
-                , recovery_checks_(recovery_checks_vec)
+            TimingCheck(std::vector<Timing> timing_checks_vec)
+                : timing_checks_(timing_checks_vec)
                 {}
 
-            std::vector<Setup> setup() const { return setup_checks_; }
-            std::vector<Hold> hold() const { return hold_checks_; }
-            std::vector<Recovery> recovery() const { return recovery_checks_; }
-            std::vector<Removal> removal() const { return removal_checks_; }
+            std::vector<Timing> timing() const { return timing_checks_; }
 
             void print(std::ostream& os, int depth=0) const;
         private:
-            std::vector<Setup> setup_checks_;
-            std::vector<Hold> hold_checks_;
-            std::vector<Removal> removal_checks_;
-            std::vector<Recovery> recovery_checks_;
+            std::vector<Timing> timing_checks_;
     };
 
     //A Delay declaration

@@ -128,14 +128,12 @@
 %type <std::string> celltype
 %type <PortCondition> port_condition
 %type <TimingCheck> timing_check
-%type <Setup> setup_check
-%type <std::vector<Setup>> setup_check_list
-%type <Hold> hold_check
-%type <std::vector<Hold>> hold_check_list
-%type <Removal> removal_check
-%type <std::vector<Removal>> removal_check_list
-%type <Recovery> recovery_check
-%type <std::vector<Recovery>> recovery_check_list
+%type <std::vector<Timing>> timing_check_list
+%type <Timing> t_check
+%type <Timing> setup_check
+%type <Timing> hold_check
+%type <Timing> removal_check
+%type <Timing> recovery_check
 %type <Cell> cell
 %type <Timescale> timescale
 %type <std::string> hierarchy_divider
@@ -200,35 +198,26 @@ celltype : LPAR CELLTYPE Qid RPAR { $$ = $3; }
 instance : LPAR INSTANCE Id RPAR { $$ = $3; }
          ;
 
-timing_check : LPAR TIMINGCHECK setup_check_list RPAR { $$ = TimingCheck($3, std::vector<Hold>(), std::vector<Removal>(), std::vector<Recovery>()); }
-             | LPAR TIMINGCHECK hold_check_list RPAR { $$ = TimingCheck(std::vector<Setup>(), $3, std::vector<Removal>(), std::vector<Recovery>()); }
-             | LPAR TIMINGCHECK removal_check_list RPAR { $$ = TimingCheck(std::vector<Setup>(), std::vector<Hold>(), $3, std::vector<Recovery>()); }
-             | LPAR TIMINGCHECK recovery_check_list RPAR { $$ = TimingCheck(std::vector<Setup>(), std::vector<Hold>(), std::vector<Removal>(), $3); }
+timing_check : LPAR TIMINGCHECK timing_check_list RPAR { $$ = TimingCheck($3); }
              ;
 
-removal_check_list : removal_check { $$ = std::vector<Removal>(); $$.push_back($1); }
-                | removal_check_list removal_check { $$ = $1; $$.push_back($2); }
+timing_check_list : t_check { $$ = std::vector<Timing>(); $$.push_back($1); }
+                | timing_check_list t_check { $$ = $1; $$.push_back($2); }
                 ;
 
-removal_check : LPAR REMOVAL port_spec port_spec real_triple RPAR { $$ = Removal($4, $3, $5); }
+t_check: removal_check
+       | recovery_check
+       | hold_check
+       | setup_check
+       ;
 
-recovery_check_list : recovery_check { $$ = std::vector<Recovery>(); $$.push_back($1); }
-                | recovery_check_list recovery_check { $$ = $1; $$.push_back($2); }
-                ;
+removal_check : LPAR REMOVAL port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "REMOVAL"); }
 
-recovery_check : LPAR RECOVERY port_spec port_spec real_triple RPAR { $$ = Recovery($4, $3, $5); }
+recovery_check : LPAR RECOVERY port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "RECOVERY"); }
 
-hold_check_list : hold_check { $$ = std::vector<Hold>(); $$.push_back($1); }
-                | hold_check_list hold_check { $$ = $1; $$.push_back($2); }
-                ;
+hold_check : LPAR HOLD port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "HOLD"); }
 
-hold_check : LPAR HOLD port_spec port_spec real_triple RPAR { $$ = Hold($4, $3, $5); }
-
-setup_check_list : setup_check { $$ = std::vector<Setup>(); $$.push_back($1); }
-                 | setup_check_list setup_check { $$ = $1; $$.push_back($2); }
-                 ;
-
-setup_check : LPAR SETUP port_spec port_spec real_triple RPAR { $$ = Setup($4, $3, $5); }
+setup_check : LPAR SETUP port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "SETUP"); }
 
 
 delay : LPAR DELAY absolute RPAR { $$ = Delay(Delay::Type::ABSOLUTE, $3); }
