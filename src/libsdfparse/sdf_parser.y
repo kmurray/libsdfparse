@@ -183,7 +183,7 @@ hierarchy_divider : LPAR DIVIDER Id RPAR { $$ = $3; }
 timescale : LPAR TIMESCALE Float Id RPAR { $$ = Timescale($3, $4); }
           ;
 
-cell : LPAR CELL celltype instance delay timing_check RPAR { $$ = Cell($3, $4, $5, $6); }
+cell : LPAR CELL celltype instance timing_check RPAR { $$ = Cell($3, $4, Delay(), $5); }
      | LPAR CELL celltype instance delay RPAR { $$ = Cell($3, $4, $5, TimingCheck()); }
      | LPAR CELL celltype instance RPAR { $$ = Cell($3, $4, Delay(), TimingCheck()); }
      ;
