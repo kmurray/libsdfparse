@@ -60,11 +60,8 @@ namespace sdfparse {
         }
     }
 
-    void Setup::print(std::ostream& os, int depth) const {
-        os << ident(depth) << "(SETUP " << port() << " " << clock() << " " << tsu() << ")\n";
-    }
-    void Hold::print(std::ostream& os, int depth) const {
-        os << ident(depth) << "(HOLD " << port() << " " << clock() << " " << thld() << ")\n";
+    void Timing::print(std::ostream& os, int depth) const {
+        os << ident(depth) << type() << port() << " " << clock() << " " << t() << ")\n";
     }
 
     void TimingCheck::print(std::ostream& os, int depth) const {
