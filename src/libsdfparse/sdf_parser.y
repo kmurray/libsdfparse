@@ -237,6 +237,7 @@ iopath : LPAR IOPATH port_spec port_spec real_triple real_triple RPAR { $$ = Iop
 
 port_spec : Id { $$ = PortSpec($1, PortCondition::NONE); }
           | LPAR port_condition Id RPAR { $$ = PortSpec($3, $2); }
+          | Float { $$ = PortSpec(std::to_string((int)$1), PortCondition::NONE); }
           ;
 
 port_condition: POSEDGE { $$ = PortCondition::POSEDGE; }
