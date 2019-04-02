@@ -31,6 +31,12 @@ namespace sdfparse {
                 , max_(new_max)
                 {}
 
+            RealTriple(double new_min, double new_max)
+                : min_(new_min)
+                , typ_(new_max)
+                , max_(new_max)
+                {}
+
             double min() const { return min_; }
             double max() const { return max_; }
             double typ() const { return typ_; }

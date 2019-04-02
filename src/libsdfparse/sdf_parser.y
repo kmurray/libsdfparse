@@ -235,7 +235,9 @@ port_condition: POSEDGE { $$ = PortCondition::POSEDGE; }
 
 real_triple : LPAR Float COLON Float COLON Float RPAR { $$ = RealTriple($2, $4, $6); }
             | LPAR RPAR { $$ = RealTriple(); }
+            | LPAR Float COLON COLON Float RPAR { $$ = RealTriple($2, $5); }
             ;
+
 
 Id : String { $$ = unescape_sdf_identifier($1); }
 Qid : Qstring { $$ = unescape_sdf_identifier($1); }
