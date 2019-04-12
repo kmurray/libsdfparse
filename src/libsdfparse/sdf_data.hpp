@@ -31,6 +31,12 @@ namespace sdfparse {
                 , max_(new_max)
                 {}
 
+            RealTriple(double new_min, double new_max)
+                : min_(new_min)
+                , typ_(new_max)
+                , max_(new_max)
+                {}
+
             double min() const { return min_; }
             double max() const { return max_; }
             double typ() const { return typ_; }
@@ -97,61 +103,73 @@ namespace sdfparse {
             RealTriple fall_;
     };
 
-    class Setup {
+    class Timing {
         public:
-            Setup() = default;
-            Setup(PortSpec clock_spec, PortSpec port_spec, RealTriple tsu_value)
+            Timing() = default;
+            Timing(PortSpec clock_spec, PortSpec port_spec, RealTriple value, const std::string& type)
                 : clock_(clock_spec)
                 , port_(port_spec)
-                , tsu_(tsu_value)
+                , t_(value)
+                , type_(type)
                 {}
 
             const PortSpec& clock() const { return clock_; }
             const PortSpec& port() const { return port_; }
-            RealTriple tsu() const { return tsu_; }
+            RealTriple t() const { return t_; }
+            const std::string& type() const { return type_; }
 
             void print(std::ostream& os, int depth=0) const;
         private:
             PortSpec clock_;
             PortSpec port_;
-            RealTriple tsu_;
+            RealTriple t_;
+            std::string type_;
     };
 
-    class Hold {
+    class Setup: public Timing {
+        public:
+            Setup() = default;
+            Setup(PortSpec clock_spec, PortSpec port_spec, RealTriple value) :
+                Timing(clock_spec, port_spec, value, "SETUP")
+            {}
+    };
+
+    class Hold: public Timing {
         public:
             Hold() = default;
-            Hold(PortSpec clock_spec, PortSpec port_spec, RealTriple thld_value)
-                : clock_(clock_spec)
-                , port_(port_spec)
-                , thld_(thld_value)
-                {}
+            Hold(PortSpec clock_spec, PortSpec port_spec, RealTriple value) :
+                Timing(clock_spec, port_spec, value, "HOLD")
+            {}
+    };
 
-            const PortSpec& clock() const { return clock_; }
-            const PortSpec& port() const { return port_; }
-            RealTriple thld() const { return thld_; }
+    class Recovery: public Timing {
+        public:
+            Recovery() = default;
+            Recovery(PortSpec clock_spec, PortSpec port_spec, RealTriple value) :
+                Timing(clock_spec, port_spec, value, "RECOVERY")
+            {}
+    };
 
-            void print(std::ostream& os, int depth=0) const;
-        private:
-            PortSpec clock_;
-            PortSpec port_;
-            RealTriple thld_;
+    class Removal: public Timing {
+        public:
+            Removal() = default;
+            Removal(PortSpec clock_spec, PortSpec port_spec, RealTriple value) :
+                Timing(clock_spec, port_spec, value, "REMOVAL")
+            {}
     };
 
     class TimingCheck {
         public:
             TimingCheck() = default;
-            TimingCheck(std::vector<Setup> setup_checks_vec, std::vector<Hold> hold_checks_vec)
-                : setup_checks_(setup_checks_vec)
-                , hold_checks_(hold_checks_vec)
+            TimingCheck(std::vector<Timing> timing_checks_vec)
+                : timing_checks_(timing_checks_vec)
                 {}
 
-            std::vector<Setup> setup() const { return setup_checks_; }
-            std::vector<Hold> hold() const { return hold_checks_; }
+            std::vector<Timing> timing() const { return timing_checks_; }
 
             void print(std::ostream& os, int depth=0) const;
         private:
-            std::vector<Setup> setup_checks_;
-            std::vector<Hold> hold_checks_;
+            std::vector<Timing> timing_checks_;
     };
 
     //A Delay declaration

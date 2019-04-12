@@ -108,6 +108,8 @@
 %token NEGEDGE "negedge"
 %token SETUP "SETUP"
 %token HOLD "HOLD"
+%token REMOVAL "REMOVAL"
+%token RECOVERY "RECOVERY"
 %token TIMINGCHECK "TIMINGCHECK"
 %token <double> Float "float"
 %token <std::string> String "string"
@@ -126,10 +128,12 @@
 %type <std::string> celltype
 %type <PortCondition> port_condition
 %type <TimingCheck> timing_check
-%type <Setup> setup_check
-%type <std::vector<Setup>> setup_check_list
-%type <Hold> hold_check
-%type <std::vector<Hold>> hold_check_list
+%type <std::vector<Timing>> timing_check_list
+%type <Timing> t_check
+%type <Timing> setup_check
+%type <Timing> hold_check
+%type <Timing> removal_check
+%type <Timing> recovery_check
 %type <Cell> cell
 %type <Timescale> timescale
 %type <std::string> hierarchy_divider
@@ -183,9 +187,10 @@ hierarchy_divider : LPAR DIVIDER Id RPAR { $$ = $3; }
 timescale : LPAR TIMESCALE Float Id RPAR { $$ = Timescale($3, $4); }
           ;
 
-cell : LPAR CELL celltype instance delay timing_check RPAR { $$ = Cell($3, $4, $5, $6); }
+cell : LPAR CELL celltype instance timing_check RPAR { $$ = Cell($3, $4, Delay(), $5); }
      | LPAR CELL celltype instance delay RPAR { $$ = Cell($3, $4, $5, TimingCheck()); }
      | LPAR CELL celltype instance RPAR { $$ = Cell($3, $4, Delay(), TimingCheck()); }
+     | LPAR CELL celltype instance delay timing_check RPAR { $$ = Cell($3, $4, Delay(), TimingCheck()); }
      ;
 
 celltype : LPAR CELLTYPE Qid RPAR { $$ = $3; }
@@ -194,21 +199,26 @@ celltype : LPAR CELLTYPE Qid RPAR { $$ = $3; }
 instance : LPAR INSTANCE Id RPAR { $$ = $3; }
          ;
 
-timing_check : LPAR TIMINGCHECK setup_check_list RPAR { $$ = TimingCheck($3, std::vector<Hold>()); }
-             | LPAR TIMINGCHECK setup_check_list hold_check_list RPAR { $$ = TimingCheck($3, $4); }
+timing_check : LPAR TIMINGCHECK timing_check_list RPAR { $$ = TimingCheck($3); }
              ;
 
-hold_check_list : hold_check { $$ = std::vector<Hold>(); $$.push_back($1); }
-                | hold_check_list hold_check { $$ = $1; $$.push_back($2); }
+timing_check_list : t_check { $$ = std::vector<Timing>(); $$.push_back($1); }
+                | timing_check_list t_check { $$ = $1; $$.push_back($2); }
                 ;
 
-hold_check : LPAR HOLD port_spec port_spec real_triple RPAR { $$ = Hold($4, $3, $5); }
+t_check: removal_check
+       | recovery_check
+       | hold_check
+       | setup_check
+       ;
 
-setup_check_list : setup_check { $$ = std::vector<Setup>(); $$.push_back($1); }
-                 | setup_check_list setup_check { $$ = $1; $$.push_back($2); }
-                 ;
+removal_check : LPAR REMOVAL port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "REMOVAL"); }
 
-setup_check : LPAR SETUP port_spec port_spec real_triple RPAR { $$ = Setup($4, $3, $5); }
+recovery_check : LPAR RECOVERY port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "RECOVERY"); }
+
+hold_check : LPAR HOLD port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "HOLD"); }
+
+setup_check : LPAR SETUP port_spec port_spec real_triple RPAR { $$ = Timing($4, $3, $5, "SETUP"); }
 
 
 delay : LPAR DELAY absolute RPAR { $$ = Delay(Delay::Type::ABSOLUTE, $3); }
@@ -227,6 +237,7 @@ iopath : LPAR IOPATH port_spec port_spec real_triple real_triple RPAR { $$ = Iop
 
 port_spec : Id { $$ = PortSpec($1, PortCondition::NONE); }
           | LPAR port_condition Id RPAR { $$ = PortSpec($3, $2); }
+          | Float { $$ = PortSpec(std::to_string((int)$1), PortCondition::NONE); }
           ;
 
 port_condition: POSEDGE { $$ = PortCondition::POSEDGE; }
@@ -235,7 +246,9 @@ port_condition: POSEDGE { $$ = PortCondition::POSEDGE; }
 
 real_triple : LPAR Float COLON Float COLON Float RPAR { $$ = RealTriple($2, $4, $6); }
             | LPAR RPAR { $$ = RealTriple(); }
+            | LPAR Float COLON COLON Float RPAR { $$ = RealTriple($2, $5); }
             ;
+
 
 Id : String { $$ = unescape_sdf_identifier($1); }
 Qid : Qstring { $$ = unescape_sdf_identifier($1); }

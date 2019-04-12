@@ -89,6 +89,8 @@ posedge                                         { return sdfparse::Parser::make_
 negedge                                         { return sdfparse::Parser::make_NEGEDGE(loc_); }
 SETUP                                           { return sdfparse::Parser::make_SETUP(loc_); }
 HOLD                                            { return sdfparse::Parser::make_HOLD(loc_); }
+REMOVAL                                         { return sdfparse::Parser::make_REMOVAL(loc_); }
+RECOVERY                                        { return sdfparse::Parser::make_RECOVERY(loc_); }
 TIMINGCHECK                                     { return sdfparse::Parser::make_TIMINGCHECK(loc_); }
 [-+]?({DIGIT}*\.?{DIGIT}+|{DIGIT}+\.)           { 
                                                     /*cout << "Float: " << YYText() << "\n";*/
